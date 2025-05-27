@@ -192,7 +192,7 @@
                                 <div><strong>Start Time:</strong> ${run.start_time}</div>
                                 ${run.end_time ? `<div><strong>End Time:</strong> ${run.end_time}</div>` : ''}
                                 <div><strong>Result File:</strong> ${run.result_available ? `<span class="uuid-display">${run.result_available}</span>` : 'None'}</div>
-                                ${run.result_available ? `<button class="btn btn-sm btn-outline-primary mt-2" onclick="downloadSpecificResult('${run.service_uuid}')">Download Result</button>` : ''}
+                                ${run.status === 'completed' && run.result_available ? `<button class="btn btn-sm btn-outline-primary mt-2" onclick="downloadSpecificResult('${run.service_uuid}')">Download Result</button>` : ''}
                             </div>
                         `;
                     });
