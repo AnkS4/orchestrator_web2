@@ -12,6 +12,7 @@
     <style>
         .api-card { margin: 20px 0; }
         .result-area { margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; }
+        .uuid-display { font-family: monospace; background-color: #e9ecef; padding: 5px; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -39,6 +40,7 @@
                         <button class="btn btn-success" onclick="startService()">
                             Start Service
                         </button>
+                        <div id="serviceStartResult" class="result-area" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -156,9 +158,19 @@
             fetch('/api/start', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
-                alert(`Service Status: ${data.message}`);
+                const resultDiv = document.getElementById('serviceStartResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <strong>Service Started Successfully!</strong><br>
+                    <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
+                    <strong>Start Time:</strong> ${data.start_time}
+                `;
             })
-            .catch(error => alert(`Error: ${error.message}`));
+            .catch(error => {
+                const resultDiv = document.getElementById('serviceStartResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            });
         }
 
         // Check status function
@@ -167,7 +179,17 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('statusArea').style.display = 'block';
-                document.getElementById('statusResult').textContent = JSON.stringify(data, null, 2);
+                
+                let statusHtml = `<strong>Status:</strong> ${data.status}<br>`;
+                statusHtml += `<strong>Result Available:</strong> ${data.result_available}<br>`;
+                statusHtml += `<strong>Check Time:</strong> ${data.timestamp}<br>`;
+                
+                if (data.service_uuid) {
+                    statusHtml += `<strong>Service UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>`;
+                    statusHtml += `<strong>Service Start Time:</strong> ${data.start_time}<br>`;
+                }
+                
+                document.getElementById('statusResult').innerHTML = statusHtml;
             })
             .catch(error => {
                 document.getElementById('statusArea').style.display = 'block';
