@@ -39,10 +39,8 @@ class StartService(Resource):
     def post(self):
         global service_runs
 
-        running_services = [run for run in service_runs if run['status'] == 'running']
-        if running_services:
-            logging.warning('Service start attempted while another service is running')
-            return {'message': 'Another service is already running'}, 409
+        # Remove the check that prevents concurrent services
+        # Now multiple services can run simultaneously
 
         service_uuid = str(uuid.uuid4())
         start_time = datetime.now().isoformat()
