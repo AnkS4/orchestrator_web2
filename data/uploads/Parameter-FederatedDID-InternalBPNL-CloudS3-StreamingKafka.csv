@@ -1,0 +1,6 @@
+"Parameter","Federated (DID)","Internal (BPNL)","Cloud (S3)","Streaming (Kafka)"
+"Interoperability","★★★★★ (Gaia-X/IDSA)","★★☆☆☆ (Single org)","★★★☆☆ (Cloud-native)","★★★★☆ (Event-driven)"
+"Security","DID + OAuth2","API Key","IAM + Vault","SSL + ACLs"
+"Throughput","500-1000 req/sec","10,000+ req/sec","1 GB+/sec","15,000 msg/sec"
+"Complexity","High (DID resolution)","Low","Medium","High (Stream mgmt)"
+"Latency","200-500ms","<100ms","Variable","<50ms"
