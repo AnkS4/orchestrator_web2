@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title><!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDC Web Service</title>
@@ -22,7 +18,7 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-5">EDC Web Service Dashboard</h1>
-        
+
         <div class="row">
             <div class="col-md-6">
                 <div class="card api-card">
@@ -35,7 +31,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6">
                 <div class="card api-card">
                     <div class="card-body">
@@ -48,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6">
                 <div class="card api-card">
                     <div class="card-body">
@@ -60,20 +56,8 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6">
-                <div class="card api-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Download Result</h5>
-                        <p class="card-text">Download latest service execution result</p>
-                        <button class="btn btn-warning" onclick="downloadResult()">
-                            Download Latest Result
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-12">
                 <div class="card api-card">
                     <div class="card-body">
                         <h5 class="card-title">View Logs</h5>
@@ -85,7 +69,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div id="statusArea" class="result-area" style="display: none;">
             <h6>All Service Status:</h6>
             <div id="statusResult"></div>
@@ -135,11 +119,11 @@
         // Upload file function
         document.getElementById('uploadForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData();
             const fileInput = document.getElementById('fileInput');
             formData.append('file', fileInput.files[0]);
-            
+
             fetch('/api/upload', {
                 method: 'POST',
                 body: formData
@@ -147,12 +131,12 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('uploadResult').style.display = 'block';
-                document.getElementById('uploadResult').innerHTML = 
+                document.getElementById('uploadResult').innerHTML =
                     `<strong>Result:</strong> ${data.message}`;
             })
             .catch(error => {
                 document.getElementById('uploadResult').style.display = 'block';
-                document.getElementById('uploadResult').innerHTML = 
+                document.getElementById('uploadResult').innerHTML =
                     `<strong>Error:</strong> ${error.message}`;
             });
         });
@@ -168,7 +152,8 @@
                     resultDiv.innerHTML = `
                         <strong>Service Started Successfully!</strong><br>
                         <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
-                        <strong>Start Time:</strong> ${data.start_time}
+                        <strong>Start Time:</strong> ${data.start_time}<br>
+                        <strong>Result File:</strong> <span class="uuid-display">${data.result_filename}</span>
                     `;
                 } else {
                     resultDiv.innerHTML = `<strong>Message:</strong> ${data.message}`;
@@ -234,11 +219,6 @@
             }
         }
 
-        // Download latest result function
-        function downloadResult() {
-            window.location.href = '/api/download';
-        }
-
         // Download specific result by UUID
         function downloadSpecificResult(uuid) {
             window.location.href = `/api/download?uuid=${uuid}`;
@@ -256,11 +236,5 @@
             });
         }
     </script>
-</body>
-</html>
-</title>
-</head>
-<body>
-
 </body>
 </html>
