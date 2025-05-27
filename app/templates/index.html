@@ -12,7 +12,11 @@
     <style>
         .api-card { margin: 20px 0; }
         .result-area { margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; }
-        .uuid-display { font-family: monospace; background-color: #e9ecef; padding: 5px; border-radius: 3px; }
+        .uuid-display { font-family: monospace; background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; font-size: 0.9em; }
+        .service-item { border: 1px solid #dee2e6; border-radius: 5px; padding: 10px; margin: 5px 0; }
+        .status-running { border-left: 4px solid #28a745; }
+        .status-completed { border-left: 4px solid #007bff; }
+        .status-error { border-left: 4px solid #dc3545; }
     </style>
 </head>
 <body>
@@ -49,7 +53,7 @@
                 <div class="card api-card">
                     <div class="card-body">
                         <h5 class="card-title">Check Status</h5>
-                        <p class="card-text">Check service execution status</p>
+                        <p class="card-text">Check all service executions status</p>
                         <button class="btn btn-info" onclick="checkStatus()">
                             Check Status
                         </button>
@@ -61,9 +65,9 @@
                 <div class="card api-card">
                     <div class="card-body">
                         <h5 class="card-title">Download Result</h5>
-                        <p class="card-text">Download service execution result</p>
+                        <p class="card-text">Download latest service execution result</p>
                         <button class="btn btn-warning" onclick="downloadResult()">
-                            Download Result
+                            Download Latest Result
                         </button>
                     </div>
                 </div>
@@ -83,8 +87,8 @@
         </div>
         
         <div id="statusArea" class="result-area" style="display: none;">
-            <h6>Status Result:</h6>
-            <pre id="statusResult"></pre>
+            <h6>All Service Status:</h6>
+            <div id="statusResult"></div>
         </div>
     </div>
 
@@ -160,11 +164,15 @@
             .then(data => {
                 const resultDiv = document.getElementById('serviceStartResult');
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `
-                    <strong>Service Started Successfully!</strong><br>
-                    <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
-                    <strong>Start Time:</strong> ${data.start_time}
-                `;
+                if (data.service_uuid) {
+                    resultDiv.innerHTML = `
+                        <strong>Service Started Successfully!</strong><br>
+                        <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
+                        <strong>Start Time:</strong> ${data.start_time}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<strong>Message:</strong> ${data.message}`;
+                }
             })
             .catch(error => {
                 const resultDiv = document.getElementById('serviceStartResult');
@@ -180,26 +188,60 @@
             .then(data => {
                 document.getElementById('statusArea').style.display = 'block';
                 
-                let statusHtml = `<strong>Status:</strong> ${data.status}<br>`;
-                statusHtml += `<strong>Result Available:</strong> ${data.result_available}<br>`;
-                statusHtml += `<strong>Check Time:</strong> ${data.timestamp}<br>`;
+                let statusHtml = `
+                    <div class="mb-3">
+                        <strong>Total Services:</strong> ${data.total_services} | 
+                        <strong>Running:</strong> ${data.running_services} | 
+                        <strong>Check Time:</strong> ${data.timestamp}
+                    </div>
+                `;
                 
-                if (data.service_uuid) {
-                    statusHtml += `<strong>Service UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>`;
-                    statusHtml += `<strong>Service Start Time:</strong> ${data.start_time}<br>`;
+                if (data.service_runs && data.service_runs.length > 0) {
+                    statusHtml += '<h6>Service Executions (Most Recent First):</h6>';
+                    
+                    data.service_runs.forEach(run => {
+                        const statusClass = `status-${run.status}`;
+                        statusHtml += `
+                            <div class="service-item ${statusClass}">
+                                <div><strong>UUID:</strong> <span class="uuid-display">${run.service_uuid}</span></div>
+                                <div><strong>Status:</strong> <span class="badge bg-${getStatusColor(run.status)}">${run.status.toUpperCase()}</span></div>
+                                <div><strong>Start Time:</strong> ${run.start_time}</div>
+                                ${run.end_time ? `<div><strong>End Time:</strong> ${run.end_time}</div>` : ''}
+                                <div><strong>Result Available:</strong> ${run.result_available ? 'Yes' : 'No'}</div>
+                                ${run.result_available ? `<button class="btn btn-sm btn-outline-primary mt-2" onclick="downloadSpecificResult('${run.service_uuid}')">Download Result</button>` : ''}
+                            </div>
+                        `;
+                    });
+                } else {
+                    statusHtml += '<p>No service executions found.</p>';
                 }
                 
                 document.getElementById('statusResult').innerHTML = statusHtml;
             })
             .catch(error => {
                 document.getElementById('statusArea').style.display = 'block';
-                document.getElementById('statusResult').textContent = `Error: ${error.message}`;
+                document.getElementById('statusResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
             });
         }
 
-        // Download result function
+        // Helper function to get status color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'running': return 'warning';
+                case 'completed': return 'success';
+                case 'error': return 'danger';
+                default: return 'secondary';
+            }
+        }
+
+        // Download latest result function
         function downloadResult() {
             window.location.href = '/api/download';
+        }
+
+        // Download specific result by UUID
+        function downloadSpecificResult(uuid) {
+            window.location.href = `/api/download?uuid=${uuid}`;
         }
 
         // Load logs function
