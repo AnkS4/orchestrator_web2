@@ -187,18 +187,18 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('statusArea').style.display = 'block';
-                
+
                 let statusHtml = `
                     <div class="mb-3">
-                        <strong>Total Services:</strong> ${data.total_services} | 
-                        <strong>Running:</strong> ${data.running_services} | 
+                        <strong>Total Services:</strong> ${data.total_services} |
+                        <strong>Running:</strong> ${data.running_services} |
                         <strong>Check Time:</strong> ${data.timestamp}
                     </div>
                 `;
-                
+
                 if (data.service_runs && data.service_runs.length > 0) {
                     statusHtml += '<h6>Service Executions (Most Recent First):</h6>';
-                    
+
                     data.service_runs.forEach(run => {
                         const statusClass = `status-${run.status}`;
                         statusHtml += `
@@ -207,7 +207,7 @@
                                 <div><strong>Status:</strong> <span class="badge bg-${getStatusColor(run.status)}">${run.status.toUpperCase()}</span></div>
                                 <div><strong>Start Time:</strong> ${run.start_time}</div>
                                 ${run.end_time ? `<div><strong>End Time:</strong> ${run.end_time}</div>` : ''}
-                                <div><strong>Result Available:</strong> ${run.result_available ? 'Yes' : 'No'}</div>
+                                <div><strong>Result File:</strong> ${run.result_available ? `<span class="uuid-display">${run.result_available}</span>` : 'None'}</div>
                                 ${run.result_available ? `<button class="btn btn-sm btn-outline-primary mt-2" onclick="downloadSpecificResult('${run.service_uuid}')">Download Result</button>` : ''}
                             </div>
                         `;
@@ -215,7 +215,7 @@
                 } else {
                     statusHtml += '<p>No service executions found.</p>';
                 }
-                
+
                 document.getElementById('statusResult').innerHTML = statusHtml;
             })
             .catch(error => {
