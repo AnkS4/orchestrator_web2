@@ -4,11 +4,12 @@ import os
 import threading
 import time
 import logging
+import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
-# Service status tracker
-service_status = {'running': False, 'result_file': None}
+# Service status tracker with UUID support
+service_status = {'running': False, 'result_file': None, 'service_uuid': None, 'start_time': None}
 
 
 class UploadFile(Resource):
@@ -43,39 +44,48 @@ class StartService(Resource):
             logging.warning('Service start attempted while already running')
             return {'message': 'Service already running'}, 409
 
+        # Generate unique UUID for this service execution
+        service_uuid = str(uuid.uuid4())
+        service_status['service_uuid'] = service_uuid
+        service_status['start_time'] = datetime.now().isoformat()
+
         def run_service():
             try:
                 service_status['running'] = True
-                logging.info('Service execution started')
+                logging.info(f'Service execution started with UUID: {service_uuid}')
 
                 # Simulate service work
                 time.sleep(3)
 
-                # Create result file
-                result_path = os.path.join(
-                    current_app.config['RESULT_FOLDER'],
-                    f'result_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
-                )
+                # Create result file with UUID in filename
+                result_filename = f'result_{service_uuid}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
+                result_path = os.path.join(current_app.config['RESULT_FOLDER'], result_filename)
 
                 with open(result_path, 'w') as f:
                     f.write(f'Service execution completed at {datetime.now()}\n')
+                    f.write(f'Service UUID: {service_uuid}\n')
                     f.write('Sample processing results:\n')
                     f.write('- Data processed successfully\n')
                     f.write('- 100 records analyzed\n')
+                    f.write(f'- Execution started at: {service_status["start_time"]}\n')
 
                 service_status['result_file'] = result_path
-                logging.info(f'Service execution completed. Result saved to {result_path}')
+                logging.info(f'Service execution completed. UUID: {service_uuid}, Result saved to {result_path}')
 
             except Exception as e:
-                logging.error(f'Service execution error: {str(e)}')
+                logging.error(f'Service execution error for UUID {service_uuid}: {str(e)}')
             finally:
                 service_status['running'] = False
 
         thread = threading.Thread(target=run_service)
         thread.start()
 
-        logging.info('Service start request accepted')
-        return {'message': 'Service started successfully'}, 202
+        logging.info(f'Service start request accepted with UUID: {service_uuid}')
+        return {
+            'message': 'Service started successfully',
+            'service_uuid': service_uuid,
+            'start_time': service_status['start_time']
+        }, 202
 
 
 class CheckStatus(Resource):
@@ -85,13 +95,21 @@ class CheckStatus(Resource):
         status = 'running' if service_status['running'] else 'stopped'
         result_available = service_status['result_file'] is not None
 
-        logging.info(f'Status check: {status}, result available: {result_available}')
-
-        return {
+        response_data = {
             'status': status,
             'result_available': result_available,
             'timestamp': datetime.now().isoformat()
         }
+
+        # Include service UUID and start time if available
+        if service_status['service_uuid']:
+            response_data['service_uuid'] = service_status['service_uuid']
+            response_data['start_time'] = service_status['start_time']
+
+        logging.info(
+            f'Status check: {status}, UUID: {service_status.get("service_uuid", "None")}, result available: {result_available}')
+
+        return response_data
 
 
 class DownloadResult(Resource):
@@ -102,7 +120,7 @@ class DownloadResult(Resource):
             logging.error('Download attempted but result file not found')
             return {'message': 'Result file not available'}, 404
 
-        logging.info('Result file downloaded')
+        logging.info(f'Result file downloaded for UUID: {service_status.get("service_uuid", "Unknown")}')
         return send_file(service_status['result_file'], as_attachment=True)
 
 
