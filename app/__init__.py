@@ -15,12 +15,25 @@ def create_app():
     os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
     os.makedirs(app.config['LOG_FOLDER'], exist_ok=True)
 
-    # Setup logging
-    logging.basicConfig(
-        filename=app.config['LOG_FILE'],
-        level=logging.DEBUG,
-        format='%(asctime)s %(levelname)s: %(message)s'
-    )
+    # Disable werkzeug and other Flask loggers
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
+
+    # Create custom logger for application only
+    app_logger = logging.getLogger('edc_app')
+    app_logger.setLevel(logging.DEBUG)
+
+    # Create file handler for application logs
+    file_handler = logging.FileHandler(app.config['LOG_FILE'])
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s'
+    ))
+
+    app_logger.addHandler(file_handler)
+    app_logger.propagate = False  # Prevent propagation to root logger
+
+    # Store logger in app config for access in endpoints
+    app.config['APP_LOGGER'] = app_logger
 
     # Initialize API
     api = Api(app)
