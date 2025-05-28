@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_restful import Api
 from app.config import Config
 from app.resources.endpoints import register_resources
@@ -34,6 +34,16 @@ def create_app():
 
     # Store logger in app config for access in endpoints
     app.config['APP_LOGGER'] = app_logger
+
+    # ADD THE CACHE CONTROL HEADERS HERE
+    @app.after_request
+    def add_cache_headers(response):
+        # Only apply to API endpoints
+        if request.path.startswith('/api/'):
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
 
     # Initialize API
     api = Api(app)
