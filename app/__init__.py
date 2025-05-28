@@ -7,7 +7,12 @@ import logging
 
 
 def create_app():
-    app = Flask(__name__)
+    # Specify static folder path explicitly
+    app = Flask(
+        __name__,
+        static_folder='../static',  # Point to static folder at root level
+        static_url_path='/static'
+    )
     app.config.from_object(Config)
 
     # Create directories
