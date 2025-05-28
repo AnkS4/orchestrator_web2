@@ -1,4 +1,4 @@
-# EDC Web Service Dashboard
+# Web Service Dashboard
 
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
