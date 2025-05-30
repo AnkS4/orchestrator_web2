@@ -415,7 +415,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Upload Form Handler
+             // Upload Form Handler - Modified to handle filename display
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const resultDiv = document.getElementById('uploadResult');
@@ -438,7 +438,8 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    resultDiv.innerHTML = `<strong><i class="fas fa-check-circle text-success me-2"></i>Upload successful:</strong> ${data.filename}`;
+                    const filename = data.filename || fileInput.files[0].name;
+                    resultDiv.innerHTML = `<strong><i class="fas fa-check-circle text-success me-2"></i>Upload successful: ${filename}</strong>`;
                     fileInput.value = '';
                 } else {
                     const error = await response.text();
