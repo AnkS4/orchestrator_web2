@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Service Dashboard</title>
+    <title>Panel de Servicios Web</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
@@ -268,7 +268,7 @@
         <div class="container">
             <a class="navbar-brand" href="#">
                 <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="EDC Logo" class="navbar-logo me-3">
-                <span>Service Platform</span>
+                <span>Plataforma de Servicios</span>
             </a>
         </div>
     </nav>
@@ -277,8 +277,8 @@
     <div class="dashboard-title">
         <div class="container">
             <div class="text-center">
-                <h1><i class="fas fa-tachometer-alt me-3"></i>Web Service Dashboard</h1>
-                <p class="dashboard-subtitle">Manage your services, monitor executions, and view comprehensive logs</p>
+                <h1><i class="fas fa-tachometer-alt me-3"></i>Panel de Servicios Web</h1>
+                <p class="dashboard-subtitle">Administre sus servicios, monitoree ejecuciones y vea registros detallados</p>
             </div>
         </div>
     </div>
@@ -291,13 +291,13 @@
                     <div class="card-header card-header-upload">
                         <h5 class="card-title">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            Upload File
+                            Subir Archivo
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Upload files to the server for processing and analysis</p>
+                        <p class="card-text">Suba archivos al servidor para procesamiento y análisis</p>
                         <button class="btn btn-success btn-custom" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                            <i class="fas fa-upload me-2"></i>Upload File
+                            <i class="fas fa-upload me-2"></i>Subir Archivo
                         </button>
                     </div>
                 </div>
@@ -308,13 +308,13 @@
                     <div class="card-header card-header-service">
                         <h5 class="card-title">
                             <i class="fas fa-play-circle"></i>
-                            Start Service
+                            Iniciar Servicio
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Execute background services and processing tasks</p>
+                        <p class="card-text">Ejecute servicios en segundo plano y tareas de procesamiento</p>
                         <button class="btn btn-warning btn-custom" onclick="startService()">
-                            <i class="fas fa-rocket me-2"></i>Start Service
+                            <i class="fas fa-rocket me-2"></i>Iniciar Servicio
                         </button>
                         <div id="serviceStartResult" class="result-area" style="display: none;"></div>
                     </div>
@@ -326,13 +326,13 @@
                     <div class="card-header card-header-status">
                         <h5 class="card-title">
                             <i class="fas fa-chart-line"></i>
-                            Check Status
+                            Verificar Estado
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Monitor all service executions and their current status</p>
+                        <p class="card-text">Monitoree todas las ejecuciones de servicios y su estado actual</p>
                         <button class="btn btn-info btn-custom" onclick="checkStatus()">
-                            <i class="fas fa-search me-2"></i>Check Status
+                            <i class="fas fa-search me-2"></i>Verificar Estado
                         </button>
                     </div>
                 </div>
@@ -343,13 +343,13 @@
                     <div class="card-header card-header-logs">
                         <h5 class="card-title">
                             <i class="fas fa-file-alt"></i>
-                            View Logs
+                            Ver Registros
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Access comprehensive system and service logs</p>
+                        <p class="card-text">Acceda a registros detallados del sistema y servicios</p>
                         <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#logsModal">
-                            <i class="fas fa-eye me-2"></i>View Logs
+                            <i class="fas fa-eye me-2"></i>Ver Registros
                         </button>
                     </div>
                 </div>
@@ -358,7 +358,7 @@
 
         <!-- Status Display Area -->
         <div id="statusArea" class="status-area" style="display: none;">
-            <h4><i class="fas fa-server me-2"></i>Service Status Overview</h4>
+            <h4><i class="fas fa-server me-2"></i>Resumen del Estado del Servicio</h4>
             <div id="statusResult"></div>
         </div>
     </div>
@@ -368,19 +368,19 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-upload me-2"></i>Upload File</h5>
+                    <h5 class="modal-title"><i class="fas fa-upload me-2"></i>Subir Archivo</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="uploadForm" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="fileInput" class="form-label">
-                                <i class="fas fa-file me-2"></i>Choose file to upload:
+                                <i class="fas fa-file me-2"></i>Elija un archivo para subir:
                             </label>
                             <input type="file" class="form-control" id="fileInput" name="file" required>
                         </div>
                         <button type="submit" class="btn btn-success btn-custom">
-                            <i class="fas fa-upload me-2"></i>Upload
+                            <i class="fas fa-upload me-2"></i>Subir
                         </button>
                     </form>
                     <div id="uploadResult" class="result-area" style="display: none;"></div>
@@ -394,18 +394,18 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Service Logs</h5>
+                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Registros del Servicio</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <button class="btn btn-secondary btn-custom mb-3" onclick="loadLogs()">
-                        <i class="fas fa-sync-alt me-2"></i>Refresh Logs
+                        <i class="fas fa-sync-alt me-2"></i>Actualizar Registros
                     </button>
                     <div id="logsLoading" class="text-center" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Cargando...</span>
                         </div>
-                        <p>Loading logs...</p>
+                        <p>Cargando registros...</p>
                     </div>
                     <pre id="logsContent" style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;"></pre>
                 </div>
@@ -415,7 +415,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-             // Upload Form Handler - Modified to handle filename display
+        // Upload Form Handler - Modified to handle filename display
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const resultDiv = document.getElementById('uploadResult');
@@ -424,13 +424,13 @@
 
             if (!fileInput.files[0]) {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = '<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Please select a file first</strong>';
+                resultDiv.innerHTML = '<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Por favor seleccione un archivo primero</strong>';
                 return;
             }
 
             try {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = '<strong><i class="fas fa-spinner fa-spin text-info me-2"></i>Uploading...</strong>';
+                resultDiv.innerHTML = '<strong><i class="fas fa-spinner fa-spin text-info me-2"></i>Subiendo...</strong>';
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
@@ -439,7 +439,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     const filename = data.filename || fileInput.files[0].name;
-                    resultDiv.innerHTML = `<strong><i class="fas fa-check-circle text-success me-2"></i>Upload successful: ${filename}</strong>`;
+                    resultDiv.innerHTML = `<strong><i class="fas fa-check-circle text-success me-2"></i>Subida exitosa: ${filename}</strong>`;
                     fileInput.value = '';
                 } else {
                     const error = await response.text();
@@ -447,7 +447,7 @@
                 }
             } catch (error) {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Upload failed:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error en subida:</strong> ${error.message}`;
             }
         });
 
@@ -473,12 +473,12 @@
                 resultDiv.style.display = 'block';
                 if (data.service_uuid) {
                     resultDiv.innerHTML = `
-                        <strong><i class="fas fa-check-circle text-success me-2"></i>Service Started Successfully!</strong><br>
+                        <strong><i class="fas fa-check-circle text-success me-2"></i>¡Servicio iniciado con éxito!</strong><br>
                         <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
-                        <strong>Start Time:</strong> ${data.start_time}
+                        <strong>Hora de Inicio:</strong> ${data.start_time}
                     `;
                 } else {
-                    resultDiv.innerHTML = `<strong><i class="fas fa-info-circle text-info me-2"></i>Message:</strong> ${data.message}`;
+                    resultDiv.innerHTML = `<strong><i class="fas fa-info-circle text-info me-2"></i>Mensaje:</strong> ${data.message}`;
                 }
             })
             .catch(error => {
@@ -500,24 +500,24 @@
                         <div class="col-md-4">
                             <div class="stats-card">
                                 <div class="stats-number">${data.total_services}</div>
-                                <div class="stats-label">Total Services</div>
+                                <div class="stats-label">Servicios Totales</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="stats-card">
                                 <div class="stats-number text-warning">${data.running_services}</div>
-                                <div class="stats-label">Running Services</div>
+                                <div class="stats-label">Servicios en Ejecución</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="stats-card">
                                 <div class="stats-number text-success">${data.total_services - data.running_services}</div>
-                                <div class="stats-label">Completed Services</div>
+                                <div class="stats-label">Servicios Completados</div>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted"><i class="fas fa-clock me-1"></i>Last updated: ${data.timestamp}</small>
+                        <small class="text-muted"><i class="fas fa-clock me-1"></i>Última actualización: ${data.timestamp}</small>
                     </div>
                 `;
 
@@ -530,7 +530,7 @@
                 }
 
                 if (runs.length > 0) {
-                    statusHtml += '<h5><i class="fas fa-list me-2"></i>Service Executions (Most Recent First):</h5>';
+                    statusHtml += '<h5><i class="fas fa-list me-2"></i>Ejecuciones de Servicio (Más Recientes Primero):</h5>';
                     runs.forEach(run => {
                         const statusClass = `status-${run.status}`;
                         const statusIcon = run.status === 'running' ? 'fa-spinner fa-spin' :
@@ -541,17 +541,17 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div><strong>UUID:</strong> <span class="uuid-display">${run.service_uuid}</span></div>
-                                        <div><strong>Status:</strong> <span class="badge status-badge bg-${getStatusColor(run.status)}">
+                                        <div><strong>Estado:</strong> <span class="badge status-badge bg-${getStatusColor(run.status)}">
                                             <i class="fas ${statusIcon} me-1"></i>${run.status.toUpperCase()}
                                         </span></div>
-                                        <div><strong>Start Time:</strong> ${run.start_time}</div>
-                                        ${run.end_time ? `<div><strong>End Time:</strong> ${run.end_time}</div>` : ''}
-                                        <div><strong>Result File:</strong> ${run.result_available ? `<span class="uuid-display">${run.result_available}</span>` : 'None'}</div>
+                                        <div><strong>Hora de Inicio:</strong> ${run.start_time}</div>
+                                        ${run.end_time ? `<div><strong>Hora de Finalización:</strong> ${run.end_time}</div>` : ''}
+                                        <div><strong>Archivo de Resultado:</strong> ${run.result_available ? `<span class="uuid-display">${run.result_available}</span>` : 'Ninguno'}</div>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         ${run.status === 'completed' && run.result_available ?
                                             `<button class="btn btn-outline-primary btn-sm" onclick="downloadSpecificResult('${run.service_uuid}')">
-                                                <i class="fas fa-download me-1"></i>Download Result
+                                                <i class="fas fa-download me-1"></i>Descargar Resultado
                                             </button>` : ''}
                                     </div>
                                 </div>
@@ -559,7 +559,7 @@
                         `;
                     });
                 } else {
-                    statusHtml += '<div class="text-center py-4"><i class="fas fa-info-circle text-muted me-2"></i>No service executions found.</div>';
+                    statusHtml += '<div class="text-center py-4"><i class="fas fa-info-circle text-muted me-2"></i>No se encontraron ejecuciones de servicio.</div>';
                 }
 
                 document.getElementById('statusResult').innerHTML = statusHtml;
@@ -603,9 +603,9 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                logsContent.textContent = data.logs || 'No logs available';
+                logsContent.textContent = data.logs || 'No hay registros disponibles';
             } catch (error) {
-                logsContent.textContent = `Error loading logs: ${error.message}`;
+                logsContent.textContent = `Error al cargar registros: ${error.message}`;
             } finally {
                 logsLoading.style.display = 'none';
                 logsContent.style.display = 'block';
