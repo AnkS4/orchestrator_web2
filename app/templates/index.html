@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Web Service Dashboard</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
@@ -404,6 +401,12 @@
                     <button class="btn btn-secondary btn-custom mb-3" onclick="loadLogs()">
                         <i class="fas fa-sync-alt me-2"></i>Refresh Logs
                     </button>
+                    <div id="logsLoading" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Loading logs...</p>
+                    </div>
                     <pre id="logsContent" style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;"></pre>
                 </div>
             </div>
@@ -412,37 +415,52 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
-        }
-        updateTime();
-        setInterval(updateTime, 1000);
-
-        // Upload file function
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        // Upload Form Handler
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const formData = new FormData();
+            const resultDiv = document.getElementById('uploadResult');
             const fileInput = document.getElementById('fileInput');
-            formData.append('file', fileInput.files[0]);
+            const formData = new FormData(e.target);
 
-            fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('uploadResult').style.display = 'block';
-                document.getElementById('uploadResult').innerHTML =
-                    `<strong><i class="fas fa-check-circle text-success me-2"></i>Result:</strong> ${data.message}`;
-            })
-            .catch(error => {
-                document.getElementById('uploadResult').style.display = 'block';
-                document.getElementById('uploadResult').innerHTML =
-                    `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error:</strong> ${error.message}`;
-            });
+            if (!fileInput.files[0]) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Please select a file first</strong>';
+                return;
+            }
+
+            try {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<strong><i class="fas fa-spinner fa-spin text-info me-2"></i>Uploading...</strong>';
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<strong><i class="fas fa-check-circle text-success me-2"></i>Upload successful:</strong> ${data.filename}`;
+                    fileInput.value = '';
+                } else {
+                    const error = await response.text();
+                    throw new Error(error || `Server error: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Upload failed:</strong> ${error.message}`;
+            }
+        });
+
+        // Reset upload form and result when modal is shown
+        document.getElementById('uploadModal').addEventListener('show.bs.modal', function () {
+            document.getElementById('uploadForm').reset();
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+        });
+
+        // Load logs when modal is opened
+        document.getElementById('logsModal').addEventListener('show.bs.modal', function () {
+            loadLogs();
         });
 
         // Start service function
@@ -502,10 +520,17 @@
                     </div>
                 `;
 
-                if (data.service_runs && data.service_runs.length > 0) {
-                    statusHtml += '<h5><i class="fas fa-list me-2"></i>Service Executions (Most Recent First):</h5>';
+                // Handle both array and object formats
+                let runs = [];
+                if (Array.isArray(data.service_runs)) {
+                    runs = data.service_runs;
+                } else if (data.service_runs && typeof data.service_runs === 'object') {
+                    runs = Object.values(data.service_runs);
+                }
 
-                    data.service_runs.forEach(run => {
+                if (runs.length > 0) {
+                    statusHtml += '<h5><i class="fas fa-list me-2"></i>Service Executions (Most Recent First):</h5>';
+                    runs.forEach(run => {
                         const statusClass = `status-${run.status}`;
                         const statusIcon = run.status === 'running' ? 'fa-spinner fa-spin' :
                                          run.status === 'completed' ? 'fa-check-circle' : 'fa-exclamation-circle';
@@ -540,7 +565,11 @@
             })
             .catch(error => {
                 document.getElementById('statusArea').style.display = 'block';
-                document.getElementById('statusResult').innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i><strong>Error:</strong> ${error.message}</div>`;
+                document.getElementById('statusResult').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error:</strong> ${error.message}
+                    </div>`;
             });
         }
 
@@ -560,17 +589,28 @@
         }
 
         // Load logs function
-        function loadLogs() {
-            fetch('/api/logs')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('logsContent').textContent = data.logs || 'No logs available';
-            })
-            .catch(error => {
-                document.getElementById('logsContent').textContent = `Error loading logs: ${error.message}`;
-            });
+        async function loadLogs() {
+            const logsContent = document.getElementById('logsContent');
+            const logsLoading = document.getElementById('logsLoading');
+
+            logsContent.style.display = 'none';
+            logsLoading.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/logs');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                logsContent.textContent = data.logs || 'No logs available';
+            } catch (error) {
+                logsContent.textContent = `Error loading logs: ${error.message}`;
+            } finally {
+                logsLoading.style.display = 'none';
+                logsContent.style.display = 'block';
+            }
         }
+
     </script>
 </body>
 </html>
-r
