@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Web Service Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -20,14 +24,16 @@
 
         body {
             background-color: #ffffff;
-            font-family: 'Inter', 'Lato', sans-serif;
+            font-family: "Inter", "Odoo Unicode Support Noto", serif;
         }
 
         /* Custom Navbar */
         .custom-navbar {
             background: #203464;
-            font-family: 'Lato', sans-serif;
-            font-weight: 500;
+            font-family: "Inter", "Odoo Unicode Support Noto", serif;
+            font-weight: 400;
+            text-align: left;
+            margin: 0;
             border-bottom: 1px solid #5a4f7f;
             color: rgba(255, 255, 255, 0.9);
         }
@@ -45,13 +51,13 @@
         .navbar-brand {
             display: flex;
             align-items: center;
-            color: white !important;
+            color: white;
             font-weight: 600;
             font-size: 1.1rem;
         }
 
         .navbar-text {
-            color: rgba(255,255,255,0.8) !important;
+            color: rgba(255,255,255,0.8);
             font-size: 0.9rem;
         }
 
@@ -59,7 +65,6 @@
         .dashboard-title {
             background: white;
             padding: 2rem 0;
-            border-bottom: 3px solid var(--secondary-color);
             margin-bottom: 2rem;
         }
 
