@@ -513,7 +513,7 @@
             });
         }
 
-        // Check status function - FIXED
+        // Check status function
         function checkStatus() {
             fetch('/api/status')
             .then(response => response.json())
@@ -612,9 +612,6 @@
                                 <div class="col-md-8">
                                     <div><strong>UUID:</strong> <span class="uuid-display">${run.service_uuid}</span></div>
                                     <div><strong>Servicio:</strong> ${run.service_name.toUpperCase()}</div>
-                                    <div><strong>Estado:</strong> <span class="badge status-badge bg-${getStatusColor(run.status)}">
-                                        <i class="fas ${statusIcon} me-1"></i>${run.status.toUpperCase()}
-                                    </span></div>
                                     <div><strong>Hora de Inicio:</strong> ${new Date(run.start_time).toLocaleString()}</div>
                                     ${run.end_time ? `<div><strong>Hora de Finalización:</strong> ${new Date(run.end_time).toLocaleString()}</div>` : ''}
                                 </div>
