@@ -267,7 +267,7 @@
     <nav class="navbar navbar-expand-lg custom-navbar">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="EDC Logo" class="navbar-logo me-3">
+                <img src="/static/images/logo2.png" alt="EDC Logo" class="navbar-logo me-3">
                 <span>Plataforma de Servicios</span>
             </a>
         </div>
@@ -415,6 +415,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Helper function to get status icon
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'running': return 'fa-spinner fa-spin';
+                case 'completed': return 'fa-check-circle';
+                case 'error': return 'fa-exclamation-circle';
+                default: return 'fa-question-circle';
+            }
+        }
+
+        // Helper function to get status color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'running': return 'warning';
+                case 'completed': return 'success';
+                case 'error': return 'danger';
+                default: return 'secondary';
+            }
+        }
+
         // Upload Form Handler - Modified to handle filename display
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -431,7 +451,9 @@
             try {
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = '<strong><i class="fas fa-spinner fa-spin text-info me-2"></i>Subiendo...</strong>';
-                const response = await fetch('/api/upload', {
+                const urlParams = new URLSearchParams(window.location.search);
+                const service = urlParams.get('service') || 'service1';
+                const response = await fetch(`/api/upload?service=${service}`, {
                     method: 'POST',
                     body: formData
                 });
@@ -466,20 +488,23 @@
 
         // Start service function
         function startService() {
-            fetch('/api/start', { method: 'POST' })
+            // Get service parameter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const service = urlParams.get('service') || 'service1';
+
+            fetch(`/api/start?service=${service}`, { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 const resultDiv = document.getElementById('serviceStartResult');
                 resultDiv.style.display = 'block';
+
+                let html = `<strong><i class="fas fa-check-circle text-success me-2"></i>${data.message}</strong>`;
+
                 if (data.service_uuid) {
-                    resultDiv.innerHTML = `
-                        <strong><i class="fas fa-check-circle text-success me-2"></i>¡Servicio iniciado con éxito!</strong><br>
-                        <strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span><br>
-                        <strong>Hora de Inicio:</strong> ${data.start_time}
-                    `;
-                } else {
-                    resultDiv.innerHTML = `<strong><i class="fas fa-info-circle text-info me-2"></i>Mensaje:</strong> ${data.message}`;
+                    html += `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
                 }
+
+                resultDiv.innerHTML = html;
             })
             .catch(error => {
                 const resultDiv = document.getElementById('serviceStartResult');
@@ -488,7 +513,7 @@
             });
         }
 
-        // Check status function
+        // Check status function - FIXED
         function checkStatus() {
             fetch('/api/status')
             .then(response => response.json())
@@ -497,70 +522,109 @@
 
                 let statusHtml = `
                     <div class="row mb-4">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="stats-card">
                                 <div class="stats-number">${data.total_services}</div>
                                 <div class="stats-label">Servicios Totales</div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="stats-card">
-                                <div class="stats-number text-warning">${data.running_services}</div>
-                                <div class="stats-label">Servicios en Ejecución</div>
+                                <div class="stats-number">${data.running_services}</div>
+                                <div class="stats-label">Servicios Activos</div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="stats-card">
-                                <div class="stats-number text-success">${data.total_services - data.running_services}</div>
-                                <div class="stats-label">Servicios Completados</div>
+                                <div class="stats-number">${data.service_runs.length - data.running_services}</div>
+                                <div class="stats-label">Servicios Finalizados</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number">${data.service_runs.filter(run => run.result_available).length}</div>
+                                <div class="stats-label">Resultados Disponibles</div>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted"><i class="fas fa-clock me-1"></i>Última actualización: ${data.timestamp}</small>
+                        <small class="text-muted"><i class="fas fa-clock me-1"></i>Última actualización: ${new Date(data.timestamp).toLocaleString()}</small>
                     </div>
                 `;
 
-                // Handle both array and object formats
-                let runs = [];
-                if (Array.isArray(data.service_runs)) {
-                    runs = data.service_runs;
-                } else if (data.service_runs && typeof data.service_runs === 'object') {
-                    runs = Object.values(data.service_runs);
-                }
+                // Map for service ports
+                const portMapping = {
+                    'service1': 8001,
+                    'service2': 8002
+                };
 
-                if (runs.length > 0) {
-                    statusHtml += '<h5><i class="fas fa-list me-2"></i>Ejecuciones de Servicio (Más Recientes Primero):</h5>';
-                    runs.forEach(run => {
-                        const statusClass = `status-${run.status}`;
-                        const statusIcon = run.status === 'running' ? 'fa-spinner fa-spin' :
-                                         run.status === 'completed' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                // Process each service run
+                data.service_runs.forEach(run => {
+                    let statusClass = '';
+                    switch (run.status) {
+                        case 'running':
+                            statusClass = 'status-running';
+                            break;
+                        case 'completed':
+                            statusClass = 'status-completed';
+                            break;
+                        case 'error':
+                            statusClass = 'status-error';
+                            break;
+                        default:
+                            statusClass = '';
+                    }
 
-                        statusHtml += `
-                            <div class="service-item ${statusClass}">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <div><strong>UUID:</strong> <span class="uuid-display">${run.service_uuid}</span></div>
-                                        <div><strong>Estado:</strong> <span class="badge status-badge bg-${getStatusColor(run.status)}">
-                                            <i class="fas ${statusIcon} me-1"></i>${run.status.toUpperCase()}
-                                        </span></div>
-                                        <div><strong>Hora de Inicio:</strong> ${run.start_time}</div>
-                                        ${run.end_time ? `<div><strong>Hora de Finalización:</strong> ${run.end_time}</div>` : ''}
-                                        <div><strong>Archivo de Resultado:</strong> ${run.result_available ? `<span class="uuid-display">${run.result_available}</span>` : 'Ninguno'}</div>
-                                    </div>
-                                    <div class="col-md-4 text-end">
-                                        ${run.status === 'completed' && run.result_available ?
-                                            `<button class="btn btn-outline-primary btn-sm" onclick="downloadSpecificResult('${run.service_uuid}')">
-                                                <i class="fas fa-download me-1"></i>Descargar Resultado
-                                            </button>` : ''}
-                                    </div>
+                    // Get status icon
+                    const statusIcon = getStatusIcon(run.status);
+
+                    // Add service-specific buttons
+                    let actionButton = '';
+                    const portMapping = {
+                        'service1': 8001,
+                        'service2': 8002
+                    };
+
+                    if (run.service_name === 'service1' || run.service_name === 'service2') {
+                        const port = portMapping[run.service_name];
+                        actionButton = `
+                            <button class="btn btn-outline-primary btn-sm me-2"
+                                    onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm"
+                                    onclick="stopService('${run.service_uuid}', '${run.service_name}')">
+                                <i class="fas fa-stop-circle me-1"></i>Detener
+                            </button>
+                        `;
+                    } else if (run.service_name === 'service3') {
+                        actionButton = `
+                            <button class="btn btn-outline-success btn-sm"
+                                    onclick="downloadSpecificResult('${run.service_uuid}')">
+                                <i class="fas fa-download me-1"></i>Descargar
+                            </button>
+                        `;
+                    }
+
+                    statusHtml += `
+                        <div class="service-item ${statusClass}">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div><strong>UUID:</strong> <span class="uuid-display">${run.service_uuid}</span></div>
+                                    <div><strong>Servicio:</strong> ${run.service_name.toUpperCase()}</div>
+                                    <div><strong>Estado:</strong> <span class="badge status-badge bg-${getStatusColor(run.status)}">
+                                        <i class="fas ${statusIcon} me-1"></i>${run.status.toUpperCase()}
+                                    </span></div>
+                                    <div><strong>Hora de Inicio:</strong> ${new Date(run.start_time).toLocaleString()}</div>
+                                    ${run.end_time ? `<div><strong>Hora de Finalización:</strong> ${new Date(run.end_time).toLocaleString()}</div>` : ''}
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    ${actionButton}
                                 </div>
                             </div>
-                        `;
-                    });
-                } else {
-                    statusHtml += '<div class="text-center py-4"><i class="fas fa-info-circle text-muted me-2"></i>No se encontraron ejecuciones de servicio.</div>';
-                }
+                        </div>
+                    `;
+                });
 
                 document.getElementById('statusResult').innerHTML = statusHtml;
             })
@@ -574,14 +638,24 @@
             });
         }
 
-        // Helper function to get status color
-        function getStatusColor(status) {
-            switch(status) {
-                case 'running': return 'warning';
-                case 'completed': return 'success';
-                case 'error': return 'danger';
-                default: return 'secondary';
-            }
+        // Stop service function
+        function stopService(uuid, serviceName) {
+            // Determine port based on service name
+            const port = serviceName === 'service1' ? 8001 : 8002;
+            const url = `http://${window.location.hostname}:${port}/stop`;
+
+            fetch(url, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`Servicio ${uuid} detenido con éxito`);
+                        checkStatus(); // Refresh status
+                    } else {
+                        throw new Error('Error al detener el servicio');
+                    }
+                })
+                .catch(error => {
+                    alert(`Error: ${error.message}`);
+                });
         }
 
         // Download specific result by UUID

@@ -1,13 +1,13 @@
 from flask_restful import Resource
-from flask import request, send_file, current_app
+from flask import request, send_file, current_app, redirect
 import os
-import threading
-import time
+import requests
 import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
 service_runs = []
+DATA_DIR = "/static/files/"
 
 
 def get_logger():
@@ -17,7 +17,11 @@ def get_logger():
 
 class UploadFile(Resource):
     def post(self):
+        # Get service name from URL parameter
+        service_name = request.args.get('service', 'service1')  # Default to service1
+
         logger = get_logger()
+
         try:
             if 'file' not in request.files:
                 logger.error('No file part in the request')
@@ -32,6 +36,32 @@ class UploadFile(Resource):
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
+            port = 0
+
+            if service_name == 'service1':
+                port = 8001
+            elif service_name == 'service2':
+                port = 8002
+            elif service_name == 'service3':
+                port = 8003
+            else:
+                port = 8001
+
+            # Upload file
+            url_upload = f"http://localhost:{port}/upload-input-file"
+
+            try:
+                with open(filepath, 'rb') as f:
+                    files = {'file': (filepath, f, 'text/csv')}
+                    headers = {
+                        'Accept': 'application/json'
+                    }
+                    response_upload = requests.post(url_upload, headers=headers, files=files)
+                    response_upload.raise_for_status()
+            except Exception as e:
+                logger.error(f'Failed to upload input file: {str(e)}')
+                return {'message': 'Failed to upload input file'}, 500
+
             logger.info(f'File uploaded successfully: {filename}')
             return {'message': f'File {filename} uploaded successfully'}, 201
 
@@ -45,8 +75,11 @@ class StartService(Resource):
         global service_runs
         logger = get_logger()
 
+        # Get service name from URL parameter
+        service_name = request.args.get('service', 'service1')  # Default to service1
         service_uuid = str(uuid.uuid4())
         start_time = datetime.now().isoformat()
+
         result_filename = f'result_{service_uuid}.csv'
 
         result_path = os.path.abspath(os.path.join(current_app.config['RESULT_FOLDER'], result_filename))
@@ -58,51 +91,75 @@ class StartService(Resource):
             logger.error(f'Failed to create result file: {str(e)}')
             return {'message': 'Failed to create result file'}, 500
 
+        # SERVICE-SPECIFIC CONFIGURATION
+        result_path = ""
+        port = 0
+
+        if service_name == 'service1':
+            logger.info(f'Service 1 execution started with UUID: {service_uuid}')
+            port = 8001
+        elif service_name == 'service2':
+            logger.info(f'Service 2 execution started with UUID: {service_uuid}')
+            port = 8002
+        elif service_name == 'service3':
+            logger.info(f'Service 3 execution started with UUID: {service_uuid}')
+            # Set result file for service3
+            result_path = os.path.join(DATA_DIR, "result.csv")
+        else:
+            # Default to Service 1
+            logger.info(f'Service 1 execution started with UUID: {service_uuid}')
+            port = 8001
+
         service_run = {
             'uuid': service_uuid,
             'start_time': start_time,
             'status': 'running',
             'result_file': result_path,
-            'result_filename': result_filename,
-            'end_time': None
+            'end_time': None,
+            'service_name': service_name,
+            'port': port
         }
         service_runs.append(service_run)
 
-        def run_service():
+        # For services 1 and 2, trigger notebook server
+        if service_name in ['service1', 'service2']:
             try:
-                logger.info(f'Service execution started with UUID: {service_uuid}')
-                time.sleep(3)
+                # Start notebook server
+                url = f"http://localhost:{port}/start"
+                headers = {'Accept': 'application/json'}
+                response = requests.post(url, headers=headers)
+                response.raise_for_status()
 
-                with open(result_path, 'w') as f:
-                    f.write('timestamp,service_uuid,status\n')
-                    f.write(f'{datetime.now().isoformat()},{service_uuid},completed\n')
-
-                for run in service_runs:
-                    if run['uuid'] == service_uuid:
-                        run['status'] = 'completed'
-                        run['end_time'] = datetime.now().isoformat()
-                        break
-
-                logger.info(f'Service execution completed. UUID: {service_uuid}, Result saved to {result_path}')
-
+                return {
+                    "message": "Service started successfully",
+                    "service_uuid": service_uuid,
+                    "notebook_url": f"http://{request.host.split(':')[0]}:{port}/jupyter"
+                }
             except Exception as e:
-                logger.error(f'Service execution error for UUID {service_uuid}: {str(e)}')
-                for run in service_runs:
-                    if run['uuid'] == service_uuid:
-                        run['status'] = 'error'
-                        run['end_time'] = datetime.now().isoformat()
-                        break
+                logger.error(f'Failed to start notebook server: {str(e)}')
+                return {'message': 'Failed to start notebook server'}, 500
 
-        thread = threading.Thread(target=run_service)
-        thread.start()
+        elif service_name == 'service3':
+            return {
+                "message": "Agrixels file is being processing!",
+                "service_uuid": service_uuid,
+                "static_file": result_path
+            }
 
-        logger.info(f'Service start request accepted with UUID: {service_uuid}')
-        return {
-            'message': 'Service started successfully',
-            'service_uuid': service_uuid,
-            'start_time': start_time,
-            'result_filename': result_filename
-        }, 202
+
+class OpenNotebook(Resource):
+    def get(self):
+        service_uuid = request.args.get('uuid')
+        target_run = next((run for run in service_runs if run['uuid'] == service_uuid), None)
+
+        if not target_run:
+            return {"message": "Service not found"}, 404
+
+        port = target_run.get('port')
+        if not port:
+            return {"message": "Port not configured for this service"}, 404
+
+        return redirect(f"http://{request.host.split(':')[0]}:{port}/jupyter", code=302)
 
 
 class CheckStatus(Resource):
@@ -122,7 +179,8 @@ class CheckStatus(Resource):
                 'service_uuid': run['uuid'],
                 'status': run['status'],
                 'start_time': run['start_time'],
-                'result_available': run['result_filename'] if run['result_file'] else None
+                'result_available': os.path.exists(run['result_file']) if run['result_file'] else False,
+                'service_name': run['service_name']
             }
             if run['end_time']:
                 service_info['end_time'] = run['end_time']
@@ -190,3 +248,4 @@ def register_resources(api):
     api.add_resource(CheckStatus, '/api/status')
     api.add_resource(DownloadResult, '/api/download')
     api.add_resource(LogService, '/api/logs')
+    api.add_resource(OpenNotebook, '/api/open-notebook')
