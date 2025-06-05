@@ -5,8 +5,6 @@
 
 A modern Flask-based web service dashboard for managing file uploads, background service execution, and comprehensive monitoring with real-time logging capabilities.
 
-![Dashboard Screenshot](assets/images/screenshot.png)
-
 ## Features
 
 - **📁 File Upload Management**: Secure file upload with validation and storage
