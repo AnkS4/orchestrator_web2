@@ -5,6 +5,7 @@ import requests
 import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from pathlib import Path
 
 service_runs = []
 DATA_DIR = "/static/files/"
@@ -211,13 +212,13 @@ class DownloadResult(Resource):
             target_run = max(completed_runs, key=lambda x: x['start_time'])
             result_file = target_run['result_file']
 
-        if not os.path.exists(result_file):
+        if not Path(result_file).exists():
             logger.error(f'Download attempted but result file does not exist on disk: {result_file}')
             return {'message': 'Result file not found on disk'}, 404
 
         try:
             logger.info(f'Result file downloaded for UUID: {target_run["uuid"]}')
-            return send_file(result_file, as_attachment=True, download_name=target_run['result_filename'])
+            return send_file(result_file, as_attachment=True, download_name='result.csv')
         except Exception as e:
             logger.error(f'Error sending file: {str(e)}')
             return {'message': 'Error downloading file'}, 500
