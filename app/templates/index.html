@@ -559,26 +559,33 @@
                 // Prepare the action buttons (always shown, but without UUID)
                 const urlParams = new URLSearchParams(window.location.search);
                 const service = urlParams.get('service') || 'service1';
+                // Prepare the action buttons (always shown)
                 const portMapping = {
                     'service1': 8001,
                     'service2': 8002
                 };
+
                 let actionButton = '';
                 if (service === 'service1' || service === 'service2') {
+                    const protocol = 'http:';
+                    const hostname = window.location.hostname;
                     const port = portMapping[service];
+                    const notebookUrl = `${protocol}//${hostname}:${port}/jupyter/`;
+
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-primary btn-sm me-2"
-                                    onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                    onclick="window.open('${notebookUrl}', '_blank')">
                                 <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
                             </button>
                             <button class="btn btn-outline-danger btn-sm"
-                                    onclick="stopService('', '${service}')">
+                                    onclick="stopService('${data.service_uuid || ''}', '${service}')">
                                 <i class="fas fa-stop-circle me-1"></i>Detener
                             </button>
                         </div>
                     `;
-                } else if (service === 'service3') {
+                }
+                else if (service === 'service3') {
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
