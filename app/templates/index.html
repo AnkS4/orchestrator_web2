@@ -470,7 +470,7 @@
         });
 
         // Fixed startService function
-        function startService() {
+                function startService() {
             // Get service parameter from URL
             const urlParams = new URLSearchParams(window.location.search);
             const service = urlParams.get('service') || 'service1';
@@ -487,68 +487,107 @@
                     data = { message: await response.text() };
                 }
 
-                if (!response.ok) {
-                    // Throw with server-provided error message if available
-                    const errorMsg = data.message || data.error || `HTTP error! status: ${response.status}`;
-                    throw new Error(errorMsg);
-                }
+                // Attach the HTTP status to the data for later use
+                data.status = response.status;
+                data.ok = response.ok;
+
                 return data;
             })
             .then(data => {
                 resultDiv.style.display = 'block';
 
-                // Check if response indicates an error
-                if (data.error || data.message.toLowerCase().includes('error')) {
-                    resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error: ${data.message || data.error}</strong>`;
+                // Prepare the message (error or success)
+                let messageHtml = '';
+                if (!data.ok || data.error || (data.message && data.message.toLowerCase().includes('error'))) {
+                    messageHtml = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error: ${data.message || data.error || `HTTP error! status: ${data.status}`}</strong>`;
                 } else {
-                    let html = `<strong><i class="fas fa-check-circle text-success me-2"></i>${data.message}</strong>`;
-
-                    if (data.service_uuid) {
-                        html += `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
-
-                        // Add service-specific buttons directly without relying on 'run' object
-                        const portMapping = {
-                            'service1': 8001,
-                            'service2': 8002
-                        };
-
-                        let actionButton = '';
-                        if (service === 'service1' || service === 'service2') {
-                            const port = portMapping[service];
-                            actionButton = `
-                                <div class="mt-2">
-                                    <button class="btn btn-outline-primary btn-sm me-2"
-                                            onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
-                                        <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm"
-                                            onclick="stopService('${data.service_uuid}', '${service}')">
-                                        <i class="fas fa-stop-circle me-1"></i>Detener
-                                    </button>
-                                </div>
-                            `;
-                        } else if (service === 'service3') {
-                            actionButton = `
-                                <div class="mt-2">
-                                    <button class="btn btn-outline-success btn-sm"
-                                            onclick="downloadSpecificResult('${data.service_uuid}')">
-                                        <i class="fas fa-download me-1"></i>Descargar
-                                    </button>
-                                </div>
-                            `;
-                        }
-
-                        html += actionButton;
-                    }
-
-                    resultDiv.innerHTML = html;
+                    messageHtml = `<strong><i class="fas fa-check-circle text-success me-2"></i>${data.message}</strong>`;
                 }
+
+                // Prepare the UUID display if available
+                let uuidHtml = '';
+                if (data.service_uuid) {
+                    uuidHtml = `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
+                }
+
+                // Prepare the action buttons (always shown)
+                const portMapping = {
+                    'service1': 8001,
+                    'service2': 8002
+                };
+
+                let actionButton = '';
+                if (service === 'service1' || service === 'service2') {
+                    const port = portMapping[service];
+                    actionButton = `
+                        <div class="mt-2">
+                            <button class="btn btn-outline-primary btn-sm me-2"
+                                    onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm"
+                                    onclick="stopService('${data.service_uuid || ''}', '${service}')">
+                                <i class="fas fa-stop-circle me-1"></i>Detener
+                            </button>
+                        </div>
+                    `;
+                } else if (service === 'service3') {
+                    actionButton = `
+                        <div class="mt-2">
+                            <button class="btn btn-outline-success btn-sm"
+                                    onclick="downloadSpecificResult('${data.service_uuid || ''}')">
+                                <i class="fas fa-download me-1"></i>Descargar
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Combine everything and update the resultDiv
+                resultDiv.innerHTML = messageHtml + uuidHtml + actionButton;
             })
             .catch(error => {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error:</strong> ${error.message}`;
+
+                // Show error message and always show the buttons
+                let messageHtml = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error:</strong> ${error.message}`;
+
+                // Prepare the action buttons (always shown, but without UUID)
+                const urlParams = new URLSearchParams(window.location.search);
+                const service = urlParams.get('service') || 'service1';
+                const portMapping = {
+                    'service1': 8001,
+                    'service2': 8002
+                };
+                let actionButton = '';
+                if (service === 'service1' || service === 'service2') {
+                    const port = portMapping[service];
+                    actionButton = `
+                        <div class="mt-2">
+                            <button class="btn btn-outline-primary btn-sm me-2"
+                                    onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm"
+                                    onclick="stopService('', '${service}')">
+                                <i class="fas fa-stop-circle me-1"></i>Detener
+                            </button>
+                        </div>
+                    `;
+                } else if (service === 'service3') {
+                    actionButton = `
+                        <div class="mt-2">
+                            <button class="btn btn-outline-success btn-sm"
+                                    onclick="downloadSpecificResult('')">
+                                <i class="fas fa-download me-1"></i>Descargar
+                            </button>
+                        </div>
+                    `;
+                }
+
+                resultDiv.innerHTML = messageHtml + actionButton;
             });
         }
+
 
         // Check status function
         function checkStatus() {
