@@ -138,7 +138,7 @@ class StartService(Resource):
                 }
             except Exception as e:
                 logger.error(f'Failed to start notebook server: {str(e)}')
-                return {'message': 'Failed to start notebook server'}, 500
+                return {'message': 'File is not uploaded or service is already running!'}, 500
 
         elif service_name == 'service3':
             return {
