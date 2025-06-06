@@ -486,28 +486,37 @@
             loadLogs();
         });
 
-        // Start service function
+        // Start service function - IMPROVED ERROR HANDLING
         function startService() {
             // Get service parameter from URL
             const urlParams = new URLSearchParams(window.location.search);
             const service = urlParams.get('service') || 'service1';
+            const resultDiv = document.getElementById('serviceStartResult');
 
             fetch(`/api/start?service=${service}`, { method: 'POST' })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                const resultDiv = document.getElementById('serviceStartResult');
                 resultDiv.style.display = 'block';
 
-                let html = `<strong><i class="fas fa-check-circle text-success me-2"></i>${data.message}</strong>`;
+                // Check if response indicates an error
+                if (data.error || data.message.toLowerCase().includes('error')) {
+                    resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error: ${data.message || data.error}</strong>`;
+                } else {
+                    let html = `<strong><i class="fas fa-check-circle text-success me-2"></i>${data.message}</strong>`;
 
-                if (data.service_uuid) {
-                    html += `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
+                    if (data.service_uuid) {
+                        html += `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
+                    }
+
+                    resultDiv.innerHTML = html;
                 }
-
-                resultDiv.innerHTML = html;
             })
             .catch(error => {
-                const resultDiv = document.getElementById('serviceStartResult');
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = `<strong><i class="fas fa-exclamation-circle text-danger me-2"></i>Error:</strong> ${error.message}`;
             });
