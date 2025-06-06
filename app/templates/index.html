@@ -644,24 +644,41 @@
             });
         }
 
-        // Stop service function
+        // Stop service function - IMPROVED ERROR HANDLING
         function stopService(uuid, serviceName) {
             // Determine port based on service name
             const port = serviceName === 'service1' ? 8001 : 8002;
             const url = `http://${window.location.hostname}:${port}/stop`;
 
-            fetch(url, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        alert(`Servicio ${uuid} detenido con éxito`);
-                        checkStatus(); // Refresh status
-                    } else {
-                        throw new Error('Error al detener el servicio');
-                    }
-                })
-                .catch(error => {
-                    alert(`Error: ${error.message}`);
-                });
+            fetch(url, {
+                method: 'POST',
+                mode: 'cors' // Add CORS mode
+            })
+            .then(response => {
+                // Check if response is ok (status 200-299)
+                if (response.ok) {
+                    // Show success message in Spanish
+                    alert(`Servicio ${uuid} detenido exitosamente`);
+                    checkStatus(); // Refresh status
+                    return response.text(); // Get response text for debugging
+                } else {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+            })
+            .then(responseText => {
+                // Optional: log response for debugging
+                console.log('Stop service response:', responseText);
+            })
+            .catch(error => {
+                // Handle both network errors and HTTP errors
+                console.error('Stop service error:', error);
+                if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+                    // If it's a network error but the service might have stopped, show a different message
+                    alert(`Solicitud de detención enviada para ${uuid}. Verifique el estado del servicio.`);
+                } else {
+                    alert(`Error al detener servicio: ${error.message}`);
+                }
+            });
         }
 
         // Download specific result by UUID
