@@ -142,7 +142,7 @@ class StartService(Resource):
 
         elif service_name == 'service3':
             return {
-                "message": "Agrixels file is being processing!",
+                "message": "Agrixels file generated!",
                 "service_uuid": service_uuid,
                 "static_file": result_path
             }
