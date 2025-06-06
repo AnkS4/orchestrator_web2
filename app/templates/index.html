@@ -62,7 +62,7 @@
         .dashboard-title {
             background: white;
             padding: 2rem 0;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .dashboard-title h1 {
@@ -74,6 +74,60 @@
             color: #6c757d;
             font-size: 1.1rem;
             margin-top: 0.5rem;
+        }
+
+        /* Service Description Banner */
+        .service-description-container {
+            background: linear-gradient(135deg, #4a69bd, #1e3799);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0 auto 2rem;
+            max-width: 900px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            border-left: 5px solid #f6b93b;
+        }
+
+        .service-description-container:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-right: 1rem;
+            color: #f6b93b;
+            text-shadow: 0 0 10px rgba(246, 185, 59, 0.5);
+        }
+
+        .service-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .service-details {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+            padding-left: 3.5rem;
+        }
+
+        .service-highlight {
+            background: linear-gradient(135deg, #f6b93b, #e55039);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
         }
 
         /* Enhanced Cards */
@@ -207,14 +261,6 @@
             color: var(--primary-color);
         }
 
-        /* Status Badges */
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
         /* Modal Enhancements */
         .modal-header {
             background: linear-gradient(135deg, var(--primary-color), #34495e);
@@ -260,6 +306,23 @@
                 max-height: 50px;
                 width: auto;
             }
+
+            .service-description-container {
+                padding: 1rem;
+            }
+
+            .service-title {
+                font-size: 1.3rem;
+            }
+
+            .service-details {
+                font-size: 1rem;
+                padding-left: 0;
+            }
+
+            .service-icon {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -273,16 +336,20 @@
         </div>
     </nav>
 
-    <!-- Modified Dashboard Title Section -->
+    <!-- Dashboard Title Section -->
     <div class="dashboard-title">
         <div class="container">
             <div class="text-center">
                 <h1><i class="fas fa-tachometer-alt me-3"></i>Panel de Servicios Web</h1>
                 <p class="dashboard-subtitle">Administre sus servicios, monitoree ejecuciones y vea registros detallados</p>
-
-                <!-- Service Description Element -->
-                <p id="serviceDescription" class="service-description"></p>
             </div>
+        </div>
+    </div>
+
+    <!-- Service Description Banner -->
+    <div class="container">
+        <div id="serviceDescription" class="service-description-container">
+            <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 
@@ -401,6 +468,55 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Function to set service description
+        function setServiceDescription() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const service = urlParams.get('service') || 'service1';
+            const descriptionContainer = document.getElementById('serviceDescription');
+
+            let icon, title, description, gradient;
+
+            switch(service) {
+                case 'service1':
+                    icon = 'fa-leaf';
+                    title = 'Huella de Carbono';
+                    description = 'Servicio especializado en el cálculo y análisis de la huella de carbono para organizaciones. ';
+                    gradient = 'linear-gradient(135deg, #11998e, #38ef7d)';
+                    break;
+                case 'service2':
+                    icon = 'fa-cloud-sun';
+                    title = 'Interpolaciones Meteorológicas';
+                    description = 'Servicio avanzado para la generación de modelos meteorológicos mediante técnicas de interpolación espacial.';
+                    gradient = 'linear-gradient(135deg, #3498db, #2980b9)';
+                    break;
+                case 'service3':
+                    icon = 'fa-file-code';
+                    title = 'Conversión a Agrixels';
+                    description = 'Servicio de transformación de datos que convierte archivos geoespaciales al formato Agrixels optimizado para análisis agrícola.';
+                    gradient = ' linear-gradient(135deg, #00c6ff, #0072ff)';
+                    break;
+                default:
+                    icon = 'fa-leaf';
+                    title = 'Huella de Carbono';
+                    description = 'Servicio especializado en el cálculo y análisis de la huella de carbono para organizaciones.';
+                    gradient = 'linear-gradient(135deg, #11998e, #38ef7d)';
+            }
+
+
+            // Update the container style and content
+            descriptionContainer.style.background = gradient;
+            descriptionContainer.innerHTML = `
+                <div class="service-title">
+                    <i class="fas ${icon} service-icon"></i>
+                    Servicio Actual: <span class="service-highlight">${title}</span>
+                </div>
+                <p class="service-details">${description}</p>
+            `;
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', setServiceDescription);
+
         // Helper function to get status icon
         function getStatusIcon(status) {
             switch(status) {
@@ -420,30 +536,6 @@
                 default: return 'secondary';
             }
         }
-
-        // Add this function to set service description
-        function setServiceDescription() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const service = urlParams.get('service') || 'service1';
-            const descriptionElement = document.getElementById('serviceDescription');
-
-            switch(service) {
-                case 'service1':
-                    descriptionElement.textContent = 'Servicio relacionado con Huella de Carbono';
-                    break;
-                case 'service2':
-                    descriptionElement.textContent = 'Servicio relacionado con interpolaciones meteorológicas';
-                    break;
-                case 'service3':
-                    descriptionElement.textContent = 'Servicio que convierte archivos subidos al formato agrixels';
-                    break;
-                default:
-                    descriptionElement.textContent = 'Servicio relacionado con Huella de Carbono';
-            }
-        }
-
-        // Call the function when page loads
-        document.addEventListener('DOMContentLoaded', setServiceDescription);
 
         // Upload Form Handler - Modified to handle filename display
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
