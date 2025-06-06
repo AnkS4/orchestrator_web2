@@ -193,32 +193,18 @@ class CheckStatus(Resource):
 
 class DownloadResult(Resource):
     def get(self):
-        global service_runs
         logger = get_logger()
 
-        service_uuid = request.args.get('uuid')
-
-        if service_uuid:
-            target_run = next((run for run in service_runs if run['uuid'] == service_uuid), None)
-            if not target_run or not target_run['result_file']:
-                logger.error(f'Download attempted for UUID {service_uuid} but result file not found')
-                return {'message': f'Result file not available for UUID {service_uuid}'}, 404
-            result_file = target_run['result_file']
-        else:
-            completed_runs = [run for run in service_runs if run['result_file']]
-            if not completed_runs:
-                logger.error('Download attempted but no result files available')
-                return {'message': 'No result files available'}, 404
-            target_run = max(completed_runs, key=lambda x: x['start_time'])
-            result_file = target_run['result_file']
+        result_file = os.path.join(DATA_DIR, "result.csv")
 
         if not Path(result_file).exists():
             logger.error(f'Download attempted but result file does not exist on disk: {result_file}')
             return {'message': 'Result file not found on disk'}, 404
 
         try:
-            logger.info(f'Result file downloaded for UUID: {target_run["uuid"]}')
-            return send_file(result_file, as_attachment=True, download_name='result.csv')
+            logger.info(f'Result file downloaded!')
+            return send_file(result_file, as_attachment=True, download_name=os.path.basename(result_file))
+
         except Exception as e:
             logger.error(f'Error sending file: {str(e)}')
             return {'message': 'Error downloading file'}, 500

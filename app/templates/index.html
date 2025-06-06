@@ -540,7 +540,7 @@
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
-                                    onclick="downloadSpecificResult('${data.service_uuid || ''}')">
+                                    onclick="downloadSpecificResult()">
                                 <i class="fas fa-download me-1"></i>Descargar
                             </button>
                         </div>
@@ -589,13 +589,12 @@
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
-                                    onclick="downloadSpecificResult('${data.service_uuid || ''}')">
+                                    onclick="downloadSpecificResult()">
                                 <i class="fas fa-download me-1"></i>Descargar
                             </button>
                         </div>
                     `;
                 }
-
                 resultDiv.innerHTML = messageHtml + actionButton;
             });
         }
@@ -688,7 +687,7 @@
                     } else if (run.service_name === 'service3') {
                         actionButton = `
                             <button class="btn btn-outline-success btn-sm"
-                                    onclick="downloadSpecificResult('${run.service_uuid}')">
+                                    onclick="downloadSpecificResult()">
                                 <i class="fas fa-download me-1"></i>Descargar
                             </button>
                         `;
@@ -761,27 +760,8 @@
         }
 
         // Download specific result by UUID
-        function downloadSpecificResult(uuid) {
-            // First check if the file exists by calling the API
-            fetch(`/api/download?uuid=${uuid}`, {
-                method: 'HEAD' // Use HEAD to check if file exists without downloading
-            })
-            .then(response => {
-                if (response.ok) {
-                    // File exists, proceed with download
-                    window.location.href = `/api/download?uuid=${uuid}`;
-                } else {
-                    // Handle error response
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Archivo no encontrado');
-                    });
-                }
-            })
-            .catch(error => {
-                // Show error message to user
-                alert(`Error al descargar archivo: ${error.message}`);
-                console.error('Download error:', error);
-            });
+        function downloadSpecificResult() {
+            window.location.href = '/api/download';
         }
 
         // Load logs function
