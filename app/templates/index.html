@@ -681,9 +681,28 @@
             });
         }
 
-        // Download specific result by UUID
+        // Download specific result by UUID - IMPROVED WITH PROPER ERROR HANDLING
         function downloadSpecificResult(uuid) {
-            window.location.href = `/api/download?uuid=${uuid}`;
+            // First check if the file exists by calling the API
+            fetch(`/api/download?uuid=${uuid}`, {
+                method: 'HEAD' // Use HEAD to check if file exists without downloading
+            })
+            .then(response => {
+                if (response.ok) {
+                    // File exists, proceed with download
+                    window.location.href = `/api/download?uuid=${uuid}`;
+                } else {
+                    // Handle error response
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message || 'Archivo no encontrado');
+                    });
+                }
+            })
+            .catch(error => {
+                // Show error message to user
+                alert(`Error al descargar archivo: ${error.message}`);
+                console.error('Download error:', error);
+            });
         }
 
         // Load logs function
