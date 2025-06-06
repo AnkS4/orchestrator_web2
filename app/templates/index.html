@@ -589,7 +589,7 @@
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
-                                    onclick="downloadSpecificResult('')">
+                                    onclick="downloadSpecificResult('${data.service_uuid || ''}')">
                                 <i class="fas fa-download me-1"></i>Descargar
                             </button>
                         </div>
@@ -760,7 +760,7 @@
             });
         }
 
-        // Download specific result by UUID - IMPROVED WITH PROPER ERROR HANDLING
+        // Download specific result by UUID
         function downloadSpecificResult(uuid) {
             // First check if the file exists by calling the API
             fetch(`/api/download?uuid=${uuid}`, {
