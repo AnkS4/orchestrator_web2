@@ -477,11 +477,22 @@
             const resultDiv = document.getElementById('serviceStartResult');
 
             fetch(`/api/start?service=${service}`, { method: 'POST' })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            .then(async response => {
+                let data;
+                try {
+                    // Try to parse response as JSON (even for errors)
+                    data = await response.json();
+                } catch (e) {
+                    // If not JSON, fallback to text
+                    data = { message: await response.text() };
                 }
-                return response.json();
+
+                if (!response.ok) {
+                    // Throw with server-provided error message if available
+                    const errorMsg = data.message || data.error || `HTTP error! status: ${response.status}`;
+                    throw new Error(errorMsg);
+                }
+                return data;
             })
             .then(data => {
                 resultDiv.style.display = 'block';
