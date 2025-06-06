@@ -323,23 +323,6 @@
 
             <div class="col-lg-6 col-md-6">
                 <div class="card api-card">
-                    <div class="card-header card-header-status">
-                        <h5 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Verificar Estado
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Monitoree todas las ejecuciones de servicios y su estado actual</p>
-                        <button class="btn btn-info btn-custom" onclick="checkStatus()">
-                            <i class="fas fa-search me-2"></i>Verificar Estado
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6">
-                <div class="card api-card">
                     <div class="card-header card-header-logs">
                         <h5 class="card-title">
                             <i class="fas fa-file-alt"></i>
@@ -486,7 +469,7 @@
             loadLogs();
         });
 
-        // Start service function - IMPROVED ERROR HANDLING
+        // Fixed startService function
         function startService() {
             // Get service parameter from URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -511,6 +494,40 @@
 
                     if (data.service_uuid) {
                         html += `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
+
+                        // Add service-specific buttons directly without relying on 'run' object
+                        const portMapping = {
+                            'service1': 8001,
+                            'service2': 8002
+                        };
+
+                        let actionButton = '';
+                        if (service === 'service1' || service === 'service2') {
+                            const port = portMapping[service];
+                            actionButton = `
+                                <div class="mt-2">
+                                    <button class="btn btn-outline-primary btn-sm me-2"
+                                            onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                        <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm"
+                                            onclick="stopService('${data.service_uuid}', '${service}')">
+                                        <i class="fas fa-stop-circle me-1"></i>Detener
+                                    </button>
+                                </div>
+                            `;
+                        } else if (service === 'service3') {
+                            actionButton = `
+                                <div class="mt-2">
+                                    <button class="btn btn-outline-success btn-sm"
+                                            onclick="downloadSpecificResult('${data.service_uuid}')">
+                                        <i class="fas fa-download me-1"></i>Descargar
+                                    </button>
+                                </div>
+                            `;
+                        }
+
+                        html += actionButton;
                     }
 
                     resultDiv.innerHTML = html;
