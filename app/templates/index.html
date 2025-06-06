@@ -273,12 +273,15 @@
         </div>
     </nav>
 
-    <!-- Dashboard Title Section -->
+    <!-- Modified Dashboard Title Section -->
     <div class="dashboard-title">
         <div class="container">
             <div class="text-center">
                 <h1><i class="fas fa-tachometer-alt me-3"></i>Panel de Servicios Web</h1>
                 <p class="dashboard-subtitle">Administre sus servicios, monitoree ejecuciones y vea registros detallados</p>
+
+                <!-- Service Description Element -->
+                <p id="serviceDescription" class="service-description"></p>
             </div>
         </div>
     </div>
@@ -417,6 +420,30 @@
                 default: return 'secondary';
             }
         }
+
+        // Add this function to set service description
+        function setServiceDescription() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const service = urlParams.get('service') || 'service1';
+            const descriptionElement = document.getElementById('serviceDescription');
+
+            switch(service) {
+                case 'service1':
+                    descriptionElement.textContent = 'Servicio relacionado con Huella de Carbono';
+                    break;
+                case 'service2':
+                    descriptionElement.textContent = 'Servicio relacionado con interpolaciones meteorológicas';
+                    break;
+                case 'service3':
+                    descriptionElement.textContent = 'Servicio que convierte archivos subidos al formato agrixels';
+                    break;
+                default:
+                    descriptionElement.textContent = 'Servicio relacionado con Huella de Carbono';
+            }
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', setServiceDescription);
 
         // Upload Form Handler - Modified to handle filename display
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
