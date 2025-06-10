@@ -645,7 +645,7 @@
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
                     const port = portMapping[service];
-                    const notebookUrl = `${protocol}//${hostname}:${port}/jupyter/`;
+                    const notebookUrl = `${protocol}//${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -800,7 +800,7 @@
                         const port = portMapping[run.service_name];
                         actionButton = `
                             <button class="btn btn-outline-primary btn-sm me-2"
-                                    onclick="window.open('http://${window.location.hostname}:${port}/jupyter', '_blank')">
+                                    onclick="window.open('http://${window.location.hostname}/jupyter', '_blank')">
                                 <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
                             </button>
                             <button class="btn btn-outline-danger btn-sm"

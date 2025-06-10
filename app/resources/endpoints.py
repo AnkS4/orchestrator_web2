@@ -134,7 +134,7 @@ class StartService(Resource):
                 return {
                     "message": "Service started successfully",
                     "service_uuid": service_uuid,
-                    "notebook_url": f"http://{request.host.split(':')[0]}:{port}/jupyter"
+                    "notebook_url": f"http://{service_name}.{request.host}/jupyter/"
                 }
             except Exception as e:
                 logger.error(f'Failed to start notebook server: {str(e)}')
@@ -156,10 +156,10 @@ class OpenNotebook(Resource):
         if not target_run:
             return {"message": "Service not found"}, 404
 
-        port = target_run.get('port')
+        # port = target_run.get('port')
         service_name = target_run.get('service_name')
-        if not port:
-            return {"message": "Port not configured for this service"}, 404
+        # if not port:
+        #     return {"message": "Port not configured for this service"}, 404
 
         # Build the subdomain URL for the service
         redirect_url = f"http://{service_name}.{request.host}/jupyter/"
