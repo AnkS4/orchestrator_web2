@@ -638,7 +638,7 @@
                 if (service === 'co2' || service === 'interpolation') {
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
-                    const notebookUrl = `${protocol}//${hostname}/jupyter/`;
+                    const notebookUrl = data.notebook_url || `http://${window.location.hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
