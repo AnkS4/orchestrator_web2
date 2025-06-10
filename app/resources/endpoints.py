@@ -162,7 +162,7 @@ class OpenNotebook(Resource):
             return {"message": "Port not configured for this service"}, 404
 
         # Build the subdomain URL for the service
-        redirect_url = f"http://{service_name}.{request.host}/jupyter"
+        redirect_url = f"http://{service_name}.{request.host}/jupyter/"
         return redirect(redirect_url, code=302)
 
 
