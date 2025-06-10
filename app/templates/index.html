@@ -481,25 +481,25 @@
                     icon = 'fa-leaf';
                     title = 'Huella de Carbono';
                     description = 'Servicio especializado en el cálculo y análisis de la huella de carbono para organizaciones. ';
-                    gradient = 'linear-gradient(135deg, #11998e, #38ef7d)';
                     break;
                 case 'interpolation':
                     icon = 'fa-cloud-sun';
-                    title = 'Interpolaciones Meteorológicas';
-                    description = 'Servicio avanzado para la generación de modelos meteorológicos mediante técnicas de interpolación espacial.';
-                    gradient = 'linear-gradient(135deg, #3498db, #2980b9)';
+                    title = 'Interpolación de datos metro a metro';
+                    description = `
+                        <strong>Descripción:</strong> Generación de datos continuos a escala 1x1 metro a partir de un conjunto de medidas puntuales distribuidas por el territorio. Este servicio permite estimar el valor de una variable en cada agrixel mediante técnicas de interpolación, favoreciendo así la cobertura total del terreno a partir de datos parciales. Es necesario definir en cada caso qué método de interpolación se utiliza.
+                        `;
                     break;
                 case 'agrixels':
                     icon = 'fa-file-code';
-                    title = 'Conversión a Agrixels';
-                    description = 'Servicio de transformación de datos que convierte archivos geoespaciales al formato Agrixels optimizado para análisis agrícola.';
-                    gradient = ' linear-gradient(135deg, #00c6ff, #0072ff)';
+                    title = 'Transformación de datos en AGRIXELS';
+                    description = `
+                        <strong>Descripción:</strong> Normalizar los datos de la empresa según una serie de normas agroalimentarias y asignar estos datos a cuadrículas de 1m x 1m creadas a partir de las geometrías dadas.<br><br>
+                        `;
                     break;
                 default:
                     icon = 'fa-leaf';
                     title = 'Huella de Carbono';
                     description = 'Servicio especializado en el cálculo y análisis de la huella de carbono para organizaciones.';
-                    gradient = 'linear-gradient(135deg, #11998e, #38ef7d)';
             }
 
 
