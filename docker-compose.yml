@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  orchestrator:
+    build: .
+    image: service-orchestrator:latest
+    container_name: service-orchestrator
+    network_mode: "host"
+    depends_on:
+      - service-agrixels
+      - service-notebook-co2
+      - service-notebook-interpolation
+      # - service-notebook-new
+
+  service-agrixels:
+    image: service-agrixels:latest
+    # image: service-agrixels:latest
+    container_name: service-agrixels
+    ports:
+      - "8003:8000"
+
+  service-notebook-co2:
+    image: service-notebook-co2:latest
+    # image: service-notebook-co2:latest
+    container_name: service-notebook-co2
+    ports:
+      - "8001:80"
+
+  service-notebook-interpolation:
+    image: service-notebook-interpolation:latest
+    # image: service-notebook-interpolation:latest
+    container_name: service-notebook-interpolation
+    ports:
+      - "8002:80"
+
+  # service-notebook-new:
+  #   image: service-notebook-new:latest
+  #   container_name: service-notebook-new
+  #   ports:
+  #     - "8004:80"
+  #   networks:
+  #     - upcxels-net
