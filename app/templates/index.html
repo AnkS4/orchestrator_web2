@@ -634,17 +634,10 @@
                     uuidHtml = `<br><strong>UUID:</strong> <span class="uuid-display">${data.service_uuid}</span>`;
                 }
 
-                // Prepare the action buttons (always shown)
-                const portMapping = {
-                    'co2': 8001,
-                    'interpolation': 8002
-                };
-
                 let actionButton = '';
                 if (service === 'co2' || service === 'interpolation') {
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
-                    const port = portMapping[service];
                     const notebookUrl = `${protocol}//${hostname}/jupyter/`;
 
                     actionButton = `
@@ -683,18 +676,12 @@
                 // Prepare the action buttons (always shown, but without UUID)
                 const urlParams = new URLSearchParams(window.location.search);
                 const service = urlParams.get('service') || 'co2';
-                // Prepare the action buttons (always shown)
-                const portMapping = {
-                    'co2': 8001,
-                    'interpolation': 8002
-                };
 
                 let actionButton = '';
                 if (service === 'co2' || service === 'interpolation') {
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
-                    const port = portMapping[service];
-                    const notebookUrl = `${protocol}//${hostname}:${port}/jupyter/`;
+                    const notebookUrl = `${protocol}//${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -763,12 +750,6 @@
                     </div>
                 `;
 
-                // Map for service ports
-                const portMapping = {
-                    'co2': 8001,
-                    'interpolation': 8002
-                };
-
                 // Process each service run
                 data.service_runs.forEach(run => {
                     let statusClass = '';
@@ -791,13 +772,8 @@
 
                     // Add service-specific buttons
                     let actionButton = '';
-                    const portMapping = {
-                        'co2': 8001,
-                        'interpolation': 8002
-                    };
 
                     if (run.service_name === 'co2' || run.service_name === 'interpolation') {
-                        const port = portMapping[run.service_name];
                         actionButton = `
                             <button class="btn btn-outline-primary btn-sm me-2"
                                     onclick="window.open('http://${window.location.hostname}/jupyter', '_blank')">
@@ -848,9 +824,7 @@
 
         // Stop service function - IMPROVED ERROR HANDLING
         function stopService(uuid, serviceName) {
-            // Determine port based on service name
-            const port = serviceName === 'co2' ? 8001 : 8002;
-            const url = `http://${window.location.hostname}:${port}/stop`;
+            const url = `http://${window.location.hostname}/stop`;
 
             fetch(url, {
                 method: 'POST',

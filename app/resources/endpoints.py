@@ -15,11 +15,14 @@ def get_logger():
     """Get the application logger"""
     return current_app.config['APP_LOGGER']
 
+def get_redirect_url(service_name):
+    return f"http://{service_name}.{request.host}/jupyter/"
+
 
 class UploadFile(Resource):
     def post(self):
         # Get service name from URL parameter
-        service_name = request.args.get('service', 'co2')  # Default to co2
+        # service_name = request.args.get('service', 'co2')  # Default to co2
 
         logger = get_logger()
 
@@ -37,19 +40,8 @@ class UploadFile(Resource):
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            port = 0
-
-            if service_name == 'co2':
-                port = 8001
-            elif service_name == 'interpolation':
-                port = 8002
-            elif service_name == 'agrixels':
-                port = 8003
-            else:
-                port = 8001
-
             # Upload file
-            url_upload = f"http://localhost:{port}/upload-input-file"
+            url_upload = f"http://localhost/upload-input-file"
 
             try:
                 with open(filepath, 'rb') as f:
@@ -134,7 +126,7 @@ class StartService(Resource):
                 return {
                     "message": "Service started successfully",
                     "service_uuid": service_uuid,
-                    "notebook_url": f"http://{service_name}.{request.host}/jupyter/"
+                    "notebook_url": get_redirect_url(service_name)
                 }
             except Exception as e:
                 logger.error(f'Failed to start notebook server: {str(e)}')
@@ -162,7 +154,7 @@ class OpenNotebook(Resource):
         #     return {"message": "Port not configured for this service"}, 404
 
         # Build the subdomain URL for the service
-        redirect_url = f"http://{service_name}.{request.host}/jupyter/"
+        redirect_url = get_redirect_url(service_name)
         return redirect(redirect_url, code=302)
 
 
