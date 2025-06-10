@@ -138,11 +138,11 @@ class StartService(Resource):
                 }
             except Exception as e:
                 logger.error(f'Failed to start notebook server: {str(e)}')
-                return {'message': 'File is not uploaded or service is already running!'}, 500
+                return {'message': 'El archivo no se ha cargado o el servicio ya está en funcionamiento!'}, 500
 
         elif service_name == 'service3':
             return {
-                "message": "Agrixels file generated!",
+                "message": "Archivo Agrixels generado!",
                 "service_uuid": service_uuid,
                 "static_file": result_path
             }
@@ -199,7 +199,7 @@ class DownloadResult(Resource):
 
         if not Path(result_file).exists():
             logger.error(f'Download attempted but result file does not exist on disk: {result_file}')
-            return {'message': 'Result file not found on disk'}, 404
+            return {'message': 'Archivo de resultados no encontrado en el disco.'}, 404
 
         try:
             logger.info(f'Result file downloaded!')
@@ -207,7 +207,7 @@ class DownloadResult(Resource):
 
         except Exception as e:
             logger.error(f'Error sending file: {str(e)}')
-            return {'message': 'Error downloading file'}, 500
+            return {'message': 'Error al descargar el archivo.'}, 500
 
 
 class LogService(Resource):
