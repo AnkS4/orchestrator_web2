@@ -22,7 +22,7 @@ def get_redirect_url(service_name):
 class UploadFile(Resource):
     def post(self):
         # Get service name from URL parameter
-        # service_name = request.args.get('service', 'co2')  # Default to co2
+        service_name = request.args.get('service', 'co2')  # Default to co2
 
         logger = get_logger()
 
@@ -40,8 +40,19 @@ class UploadFile(Resource):
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
+            port = 0
+
+            if service_name == 'co2':
+                port = 8001
+            elif service_name == 'interpolation':
+                port = 8002
+            elif service_name == 'agrixels':
+                port = 8003
+            else:
+                port = 8001
+
             # Upload file
-            url_upload = f"http://localhost/upload-input-file"
+            url_upload = f"http://localhost:{port}/upload-input-file"
 
             try:
                 with open(filepath, 'rb') as f:
@@ -118,7 +129,7 @@ class StartService(Resource):
         if service_name in ['co2', 'interpolation']:
             try:
                 # Start notebook server
-                url = f"http://localhost:{port}/start"
+                url = f"http://{service_name}.localhost/start"
                 headers = {'Accept': 'application/json'}
                 response = requests.post(url, headers=headers)
                 response.raise_for_status()
