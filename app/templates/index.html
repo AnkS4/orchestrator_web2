@@ -471,25 +471,25 @@
         // Function to set service description
         function setServiceDescription() {
             const urlParams = new URLSearchParams(window.location.search);
-            const service = urlParams.get('service') || 'service1';
+            const service = urlParams.get('service') || 'co2';
             const descriptionContainer = document.getElementById('serviceDescription');
 
             let icon, title, description, gradient;
 
             switch(service) {
-                case 'service1':
+                case 'co2':
                     icon = 'fa-leaf';
                     title = 'Huella de Carbono';
                     description = 'Servicio especializado en el cálculo y análisis de la huella de carbono para organizaciones. ';
                     gradient = 'linear-gradient(135deg, #11998e, #38ef7d)';
                     break;
-                case 'service2':
+                case 'interpolation':
                     icon = 'fa-cloud-sun';
                     title = 'Interpolaciones Meteorológicas';
                     description = 'Servicio avanzado para la generación de modelos meteorológicos mediante técnicas de interpolación espacial.';
                     gradient = 'linear-gradient(135deg, #3498db, #2980b9)';
                     break;
-                case 'service3':
+                case 'agrixels':
                     icon = 'fa-file-code';
                     title = 'Conversión a Agrixels';
                     description = 'Servicio de transformación de datos que convierte archivos geoespaciales al formato Agrixels optimizado para análisis agrícola.';
@@ -554,7 +554,7 @@
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = '<strong><i class="fas fa-spinner fa-spin text-info me-2"></i>Subiendo...</strong>';
                 const urlParams = new URLSearchParams(window.location.search);
-                const service = urlParams.get('service') || 'service1';
+                const service = urlParams.get('service') || 'co2';
                 const response = await fetch(`/api/upload?service=${service}`, {
                     method: 'POST',
                     body: formData
@@ -592,7 +592,7 @@
         function startService() {
             // Get service parameter from URL
             const urlParams = new URLSearchParams(window.location.search);
-            const service = urlParams.get('service') || 'service1';
+            const service = urlParams.get('service') || 'co2';
             const resultDiv = document.getElementById('serviceStartResult');
 
             fetch(`/api/start?service=${service}`, { method: 'POST' })
@@ -631,12 +631,12 @@
 
                 // Prepare the action buttons (always shown)
                 const portMapping = {
-                    'service1': 8001,
-                    'service2': 8002
+                    'co2': 8001,
+                    'interpolation': 8002
                 };
 
                 let actionButton = '';
-                if (service === 'service1' || service === 'service2') {
+                if (service === 'co2' || service === 'interpolation') {
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
                     const port = portMapping[service];
@@ -655,7 +655,7 @@
                         </div>
                     `;
                 }
-                else if (service === 'service3') {
+                else if (service === 'agrixels') {
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
@@ -677,15 +677,15 @@
 
                 // Prepare the action buttons (always shown, but without UUID)
                 const urlParams = new URLSearchParams(window.location.search);
-                const service = urlParams.get('service') || 'service1';
+                const service = urlParams.get('service') || 'co2';
                 // Prepare the action buttons (always shown)
                 const portMapping = {
-                    'service1': 8001,
-                    'service2': 8002
+                    'co2': 8001,
+                    'interpolation': 8002
                 };
 
                 let actionButton = '';
-                if (service === 'service1' || service === 'service2') {
+                if (service === 'co2' || service === 'interpolation') {
                     const protocol = 'http:';
                     const hostname = window.location.hostname;
                     const port = portMapping[service];
@@ -704,7 +704,7 @@
                         </div>
                     `;
                 }
-                else if (service === 'service3') {
+                else if (service === 'agrixels') {
                     actionButton = `
                         <div class="mt-2">
                             <button class="btn btn-outline-success btn-sm"
@@ -760,8 +760,8 @@
 
                 // Map for service ports
                 const portMapping = {
-                    'service1': 8001,
-                    'service2': 8002
+                    'co2': 8001,
+                    'interpolation': 8002
                 };
 
                 // Process each service run
@@ -787,11 +787,11 @@
                     // Add service-specific buttons
                     let actionButton = '';
                     const portMapping = {
-                        'service1': 8001,
-                        'service2': 8002
+                        'co2': 8001,
+                        'interpolation': 8002
                     };
 
-                    if (run.service_name === 'service1' || run.service_name === 'service2') {
+                    if (run.service_name === 'co2' || run.service_name === 'interpolation') {
                         const port = portMapping[run.service_name];
                         actionButton = `
                             <button class="btn btn-outline-primary btn-sm me-2"
@@ -803,7 +803,7 @@
                                 <i class="fas fa-stop-circle me-1"></i>Detener
                             </button>
                         `;
-                    } else if (run.service_name === 'service3') {
+                    } else if (run.service_name === 'agrixels') {
                         actionButton = `
                             <button class="btn btn-outline-success btn-sm"
                                     onclick="downloadSpecificResult()">
@@ -844,7 +844,7 @@
         // Stop service function - IMPROVED ERROR HANDLING
         function stopService(uuid, serviceName) {
             // Determine port based on service name
-            const port = serviceName === 'service1' ? 8001 : 8002;
+            const port = serviceName === 'co2' ? 8001 : 8002;
             const url = `http://${window.location.hostname}:${port}/stop`;
 
             fetch(url, {

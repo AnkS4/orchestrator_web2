@@ -19,7 +19,7 @@ def get_logger():
 class UploadFile(Resource):
     def post(self):
         # Get service name from URL parameter
-        service_name = request.args.get('service', 'service1')  # Default to service1
+        service_name = request.args.get('service', 'co2')  # Default to co2
 
         logger = get_logger()
 
@@ -39,11 +39,11 @@ class UploadFile(Resource):
 
             port = 0
 
-            if service_name == 'service1':
+            if service_name == 'co2':
                 port = 8001
-            elif service_name == 'service2':
+            elif service_name == 'interpolation':
                 port = 8002
-            elif service_name == 'service3':
+            elif service_name == 'agrixels':
                 port = 8003
             else:
                 port = 8001
@@ -77,7 +77,7 @@ class StartService(Resource):
         logger = get_logger()
 
         # Get service name from URL parameter
-        service_name = request.args.get('service', 'service1')  # Default to service1
+        service_name = request.args.get('service', 'co2')  # Default to co2
         service_uuid = str(uuid.uuid4())
         start_time = datetime.now().isoformat()
 
@@ -96,15 +96,15 @@ class StartService(Resource):
         result_path = ""
         port = 0
 
-        if service_name == 'service1':
+        if service_name == 'co2':
             logger.info(f'Service 1 execution started with UUID: {service_uuid}')
             port = 8001
-        elif service_name == 'service2':
+        elif service_name == 'interpolation':
             logger.info(f'Service 2 execution started with UUID: {service_uuid}')
             port = 8002
-        elif service_name == 'service3':
+        elif service_name == 'agrixels':
             logger.info(f'Service 3 execution started with UUID: {service_uuid}')
-            # Set result file for service3
+            # Set result file for agrixels
             result_path = os.path.join(DATA_DIR, "result.csv")
         else:
             # Default to Service 1
@@ -123,7 +123,7 @@ class StartService(Resource):
         service_runs.append(service_run)
 
         # For services 1 and 2, trigger notebook server
-        if service_name in ['service1', 'service2']:
+        if service_name in ['co2', 'interpolation']:
             try:
                 # Start notebook server
                 url = f"http://localhost:{port}/start"
@@ -140,7 +140,7 @@ class StartService(Resource):
                 logger.error(f'Failed to start notebook server: {str(e)}')
                 return {'message': 'El archivo no se ha cargado o el servicio ya está en funcionamiento!'}, 500
 
-        elif service_name == 'service3':
+        elif service_name == 'agrixels':
             return {
                 "message": "Archivo Agrixels generado!",
                 "service_uuid": service_uuid,
@@ -157,10 +157,13 @@ class OpenNotebook(Resource):
             return {"message": "Service not found"}, 404
 
         port = target_run.get('port')
+        service_name = target_run.get('service_name')
         if not port:
             return {"message": "Port not configured for this service"}, 404
 
-        return redirect(f"http://{request.host.split(':')[0]}:{port}/jupyter", code=302)
+        # Build the subdomain URL for the service
+        redirect_url = f"http://{service_name}.{request.host}/jupyter"
+        return redirect(redirect_url, code=302)
 
 
 class CheckStatus(Resource):
