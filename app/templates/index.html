@@ -636,9 +636,9 @@
 
                 let actionButton = '';
                 if (service === 'co2' || service === 'interpolation') {
-                    const protocol = 'http:';
+                    // Build subdomain URL: https://service.hostname/jupyter/
                     const hostname = window.location.hostname;
-                    const notebookUrl = data.notebook_url || `http://${window.location.hostname}/jupyter/`;
+                    const notebookUrl = `https://${service}.${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -679,9 +679,9 @@
 
                 let actionButton = '';
                 if (service === 'co2' || service === 'interpolation') {
-                    const protocol = 'http:';
+                    // Build subdomain URL: https://service.hostname/jupyter/
                     const hostname = window.location.hostname;
-                    const notebookUrl = `${protocol}//${hostname}/jupyter/`;
+                    const notebookUrl = `https://${service}.${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -774,9 +774,12 @@
                     let actionButton = '';
 
                     if (run.service_name === 'co2' || run.service_name === 'interpolation') {
+                        // Build subdomain URL: https://service.hostname/jupyter/
+                        const hostname = window.location.hostname;
+                        const notebookUrl = `https://${run.service_name}.${hostname}/jupyter/`;
                         actionButton = `
                             <button class="btn btn-outline-primary btn-sm me-2"
-                                    onclick="window.open('http://${window.location.hostname}/jupyter', '_blank')">
+                                    onclick="window.open('${notebookUrl}', '_blank')">
                                 <i class="fas fa-external-link-alt me-1"></i>Abrir Notebook
                             </button>
                             <button class="btn btn-outline-danger btn-sm"
@@ -824,7 +827,7 @@
 
         // Stop service function - IMPROVED ERROR HANDLING
         function stopService(uuid, serviceName) {
-            const url = `http://${window.location.hostname}/stop`;
+            const url = `https://${window.location.hostname}/stop`;
 
             fetch(url, {
                 method: 'POST',
@@ -838,7 +841,7 @@
                     checkStatus(); // Refresh status
                     return response.text(); // Get response text for debugging
                 } else {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                    throw new Error(`Error https: ${response.status}`);
                 }
             })
             .then(responseText => {
