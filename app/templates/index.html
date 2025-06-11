@@ -638,7 +638,7 @@
                 if (service === 'co2' || service === 'interpolation') {
                     // Build subdomain URL: https://service.hostname/jupyter/
                     const hostname = window.location.hostname;
-                    const notebookUrl = `https://${service}.${hostname}/jupyter/`;
+                    const notebookUrl = `https://${service}_${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -681,7 +681,7 @@
                 if (service === 'co2' || service === 'interpolation') {
                     // Build subdomain URL: https://service.hostname/jupyter/
                     const hostname = window.location.hostname;
-                    const notebookUrl = `https://${service}.${hostname}/jupyter/`;
+                    const notebookUrl = `https://${service}_${hostname}/jupyter/`;
 
                     actionButton = `
                         <div class="mt-2">
@@ -776,7 +776,7 @@
                     if (run.service_name === 'co2' || run.service_name === 'interpolation') {
                         // Build subdomain URL: https://service.hostname/jupyter/
                         const hostname = window.location.hostname;
-                        const notebookUrl = `https://${run.service_name}.${hostname}/jupyter/`;
+                        const notebookUrl = `https://${run.service_name}_${hostname}/jupyter/`;
                         actionButton = `
                             <button class="btn btn-outline-primary btn-sm me-2"
                                     onclick="window.open('${notebookUrl}', '_blank')">
