@@ -16,6 +16,20 @@ def get_logger():
     return current_app.config['APP_LOGGER']
 
 def get_redirect_url(service_name):
+    """
+    # Map service names to ports
+    ports = {
+        'co2': 8001,
+        'interpolation': 8002,
+        'agrixels': 8003
+    }
+    port = ports.get(service_name, 8001)  # Default to co2 port
+
+    # Use the same hostname as the current request
+    host = request.host.split(':')[0]  # Remove port if present
+
+    return f"http://{host}:{port}/jupyter/"
+    """
     return f"http://{service_name}.{request.host}/jupyter/"
 
 
@@ -129,7 +143,9 @@ class StartService(Resource):
         if service_name in ['co2', 'interpolation']:
             try:
                 # Start notebook server
-                url = f"http://{service_name}.localhost/start"
+                # url = f"http://{service_name}.localhost/start"
+                # Send request using port
+                url = f"http://localhost:{port}/start"
                 headers = {'Accept': 'application/json'}
                 response = requests.post(url, headers=headers)
                 response.raise_for_status()
