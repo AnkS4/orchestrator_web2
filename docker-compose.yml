@@ -32,10 +32,14 @@ services:
     ports:
       - "8002:80"
 
-  # service-notebook-new:
-  #   image: service-notebook-new:latest
-  #   container_name: service-notebook-new
-  #   ports:
-  #     - "8004:80"
-  #   networks:
-  #     - upcxels-net
+  nginx-proxy:
+    build: ./nginx
+    image: nginx-proxy:latest
+    container_name: nginx-proxy
+    network_mode: "host"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - service-notebook-co2
+      - service-notebook-interpolation

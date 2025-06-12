@@ -636,9 +636,13 @@
 
                 let actionButton = '';
                 if (service === 'co2' || service === 'interpolation') {
-                    // Build subdomain URL: https://service.hostname/jupyter/
-                    const hostname = window.location.hostname;
-                    const notebookUrl = `https://${service}_${hostname}/jupyter/`;
+                    // Use fixed URLs for each service
+                    let notebookUrl = '';
+                    if (service === 'co2') {
+                        notebookUrl = 'https://co2.services.upcxels.upc.edu/jupyter/';
+                    } else if (service === 'interpolation') {
+                        notebookUrl = 'https://interpolation.services.upcxels.upc.edu/jupyter/';
+                    }
 
                     actionButton = `
                         <div class="mt-2">
