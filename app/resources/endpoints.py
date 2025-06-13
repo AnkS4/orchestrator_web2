@@ -215,7 +215,7 @@ class DownloadResult(Resource):
     def get(self):
         logger = get_logger()
 
-        result_file = os.path.join(os.path.dirname(current_app.root_path), "static/files/result.csv")
+        result_file = os.path.join(os.path.dirname(current_app.root_path), "static/files/result.jsonld")
 
         if not Path(result_file).exists():
             logger.error(f'Download attempted but result file does not exist on disk: {result_file}')
