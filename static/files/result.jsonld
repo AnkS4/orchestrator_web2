@@ -1,0 +1,144 @@
+{
+  "@context": {
+    "agrixel": "https://agrixels.upc.edu/agrixel/",
+    "demeterAgriCommon": "https://w3id.org/demeter/agri/agriCommon/",
+    "fiware-agrifood": "https://smartdatamodels.org/dataModel.Agrifood/",
+    "foo": "https://w3id.org/def/foo#",
+    "geo": "http://www.opengis.net/ont/geosparql#",
+    "quantitykind": "http://qudt.org/vocab/quantitykind/",
+    "qudt": "http://qudt.org/schema/qudt/",
+    "s4agri": "https://saref.etsi.org/saref4agri/",
+    "sosa": "http://www.w3.org/ns/sosa/",
+    "ssn": "http://www.w3.org/ns/ssn/",
+    "time": "http://www.w3.org/2006/time#",
+    "unit": "https://qudt.org/vocab/unit/"
+  },
+  "@graph": [
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/sensor/fAnKfvKXRQOabCIYsQbq5T:APA91bHS1LVSH0fuIRCOqvzcggQJb3TY_hQOKVPA4BSc3COqetm4Dxajf3blIxCn9CCryaI9vXKgcZ0jSqSVRlbnowHbNOUDiZchGBR4kA3CFjwk6JL9_eU",
+      "@type": "sosa:Sensor"
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/result/length-67d0339c16490f000ce27815",
+      "@type": "qudt:QuantityValue",
+      "qudt:hasUnit": {
+        "@id": "unit:CentiM"
+      },
+      "qudt:numericValue": 219.07962522198258
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/observation/height-67d0339c16490f000ce27815",
+      "@type": "sosa:Observation",
+      "sosa:hasFeatureOfInterest": {
+        "@id": "https://agrixels.upc.edu/agrixel/tree/67d0339c16490f000ce27814"
+      },
+      "sosa:hasResult": {
+        "@id": "https://agrixels.upc.edu/agrixel/result/height-67d0339c16490f000ce27815"
+      },
+      "sosa:madeBySensor": {
+        "@id": "https://agrixels.upc.edu/agrixel/sensor/fAnKfvKXRQOabCIYsQbq5T:APA91bHS1LVSH0fuIRCOqvzcggQJb3TY_hQOKVPA4BSc3COqetm4Dxajf3blIxCn9CCryaI9vXKgcZ0jSqSVRlbnowHbNOUDiZchGBR4kA3CFjwk6JL9_eU"
+      },
+      "sosa:observedProperty": {
+        "@id": "quantitykind:Height"
+      },
+      "sosa:phenomenonTime": {
+        "@id": "https://agrixels.upc.edu/agrixel/time/ts-0f8565484f"
+      }
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/observation/co2-67d0339c16490f000ce27815",
+      "@type": "sosa:Observation",
+      "sosa:hasFeatureOfInterest": {
+        "@id": "https://agrixels.upc.edu/agrixel/tree/67d0339c16490f000ce27814"
+      },
+      "sosa:hasResult": {
+        "@id": "https://agrixels.upc.edu/agrixel/result/co2-67d0339c16490f000ce27815"
+      },
+      "sosa:madeBySensor": {
+        "@id": "https://agrixels.upc.edu/agrixel/sensor/fAnKfvKXRQOabCIYsQbq5T:APA91bHS1LVSH0fuIRCOqvzcggQJb3TY_hQOKVPA4BSc3COqetm4Dxajf3blIxCn9CCryaI9vXKgcZ0jSqSVRlbnowHbNOUDiZchGBR4kA3CFjwk6JL9_eU"
+      },
+      "sosa:observedProperty": {
+        "@id": "quantitykind:CO2Equivalent"
+      },
+      "sosa:phenomenonTime": {
+        "@id": "https://agrixels.upc.edu/agrixel/time/ts-0f8565484f"
+      }
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/observation/length-67d0339c16490f000ce27815",
+      "@type": "sosa:Observation",
+      "sosa:hasFeatureOfInterest": {
+        "@id": "https://agrixels.upc.edu/agrixel/tree/67d0339c16490f000ce27814"
+      },
+      "sosa:hasResult": {
+        "@id": "https://agrixels.upc.edu/agrixel/result/length-67d0339c16490f000ce27815"
+      },
+      "sosa:madeBySensor": {
+        "@id": "https://agrixels.upc.edu/agrixel/sensor/fAnKfvKXRQOabCIYsQbq5T:APA91bHS1LVSH0fuIRCOqvzcggQJb3TY_hQOKVPA4BSc3COqetm4Dxajf3blIxCn9CCryaI9vXKgcZ0jSqSVRlbnowHbNOUDiZchGBR4kA3CFjwk6JL9_eU"
+      },
+      "sosa:observedProperty": {
+        "@id": "quantitykind:Length"
+      },
+      "sosa:phenomenonTime": {
+        "@id": "https://agrixels.upc.edu/agrixel/time/ts-0f8565484f"
+      }
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/geometry/67d0339c16490f000ce27814",
+      "@type": "geo:Geometry",
+      "geo:asGeoJSON": {
+        "@type": "geo:geoJSONLiteral",
+        "@value": "{\"type\": \"Point\", \"coordinates\": [41.324823, 2.012268]}"
+      }
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/time/ts-0f8565484f",
+      "@type": "time:Instant",
+      "time:inXSDDateTimeStamp": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTimeStamp",
+        "@value": "2024-03-14T00:00:00.000Z"
+      }
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/result/co2-67d0339c16490f000ce27815",
+      "@type": "qudt:QuantityValue",
+      "qudt:hasUnit": {
+        "@id": "unit:KiloGM"
+      },
+      "qudt:numericValue": 219.07962522198258
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/tree/67d0339c16490f000ce27814",
+      "@type": [
+        "foo:Tree",
+        "sosa:FeatureOfInterest"
+      ],
+      "demeterAgriCommon:eppoConcept": {
+        "@id": "https://gd.eppo.int/taxon/FIRPL"
+      },
+      "fiware-agrifood:alternateName": "Firmiana simplex",
+      "geo:hasGeometry": {
+        "@id": "https://agrixels.upc.edu/agrixel/geometry/67d0339c16490f000ce27814"
+      },
+      "ssn:hasProperty": [
+        {
+          "@id": "quantitykind:Height"
+        },
+        {
+          "@id": "quantitykind:Length"
+        },
+        {
+          "@id": "quantitykind:CO2Equivalent"
+        }
+      ]
+    },
+    {
+      "@id": "https://agrixels.upc.edu/agrixel/result/height-67d0339c16490f000ce27815",
+      "@type": "qudt:QuantityValue",
+      "qudt:hasUnit": {
+        "@id": "unit:M"
+      },
+      "qudt:numericValue": 6.53
+    }
+  ]
+}

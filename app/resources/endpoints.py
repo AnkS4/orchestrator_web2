@@ -16,7 +16,6 @@ def get_logger():
     return current_app.config['APP_LOGGER']
 
 def get_redirect_url(service_name):
-    """
     # Map service names to ports
     ports = {
         'co2': 8001,
@@ -28,9 +27,8 @@ def get_redirect_url(service_name):
     # Use the same hostname as the current request
     host = request.host.split(':')[0]  # Remove port if present
 
-    return f"http://{host}:{port}/jupyter/"
-    """
-    return f"http://{service_name}.{request.host}/jupyter/"
+    # return f"http://{host}:{port}/jupyter/"  # For local
+    return f"https://{service_name}.{request.host}/jupyter/"  # For Remote
 
 
 class UploadFile(Resource):
@@ -122,7 +120,7 @@ class StartService(Resource):
         elif service_name == 'agrixels':
             logger.info(f'Service 3 execution started with UUID: {service_uuid}')
             # Set result file for agrixels
-            result_path = os.path.join(DATA_DIR, "result.csv")
+            result_path = os.path.join(DATA_DIR, "result.jsonld")
         else:
             # Default to Service 1
             logger.info(f'Service 1 execution started with UUID: {service_uuid}')
